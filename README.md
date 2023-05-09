@@ -45,10 +45,9 @@ Patient:
             organization: {type: Reference, refers: [Organization]}
        # choice type
        multipleBirth:
-         type: choice
-         types: [integer, boolean]
-       multipleBirthInteger: {type: integer, choice: multipleBirth}
-       multipleBirthBoolean: {type: boolean, choice: multipleBirth}
+         choices: [integer, boolean]
+       multipleBirthInteger: {type: integer, element: multipleBirth}
+       multipleBirthBoolean: {type: boolean, element: multipleBirth}
      
  ```
  
@@ -68,3 +67,26 @@ us-core-patient:
      name: { min: 1 }
   
  ```
+## package document
+
+### @package keyword
+
+## Keywords
+
+### base keyword
+
+### type keyword
+
+### elements keyword
+
+### binding keyword
+
+### array keyword
+
+### min & max keyword
+
+### slices keyword
+
+### enum keyword
+
+### choices & element keyword
