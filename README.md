@@ -8,9 +8,10 @@ It introduces JSON Schema-like representation of the FHIR StructureDefinition
 and simplifies the process of implementing FHIR validation.  
 
 ```yaml
-package: fhir
-version: 5.0.0
-url: http://hl7.fhir.org
+@package: 
+  name: fhir
+  version: 5.0.0
+  url: http://hl7.fhir.org
 Resource:
   elements:
     id: {type: id}
