@@ -71,22 +71,26 @@ us-core-patient:
 
 ### @package keyword
 
-## Keywords
+## 3 Keywords
 
-### base keyword
+### 3.1 base keyword
 
-### type keyword
+### 3.2 type keyword
 
-### elements keyword
+### 3.3 elements keyword
 
-### binding keyword
+### 3.4 require keyword
 
-### array keyword
+### 3.5 binding keyword
 
-### min & max keyword
+### 3.6 enum keyword
 
-### slices keyword
+### 3.7 array keyword
 
-### enum keyword
+### 3.8 min & max keyword
 
-### choices & element keyword
+### 3.9 slices keyword
+
+### 3.10 choices & element keyword
+
+### 3.11 recur keyword (elementReference)
