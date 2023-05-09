@@ -12,17 +12,24 @@ and simplifies the process of implementing FHIR validation.
   name: fhir
   version: 5.0.0
   url: http://hl7.fhir.org
+HumanName:
+  type: complex-type
+  elements:
+     family: {type: string}
+     given:  {type: string, array: true}
 Resource:
+  type: abstract-resource
   elements:
     id: {type: id}
 DomainResource:
+  type: abstract-resource
   base: Resource
   elements:
     text: {type: Narrative }
     containted: {type: Resource, array: true}
 Patient:
+  type: resource
   base: DomainResource
-  kind: resource
   elements:
       identifier: {type: Identifier, array: true, summary: true}
       active:     {type: boolean}
@@ -43,4 +50,21 @@ Patient:
        multipleBirthInteger: {type: integer, choice: multipleBirth}
        multipleBirthBoolean: {type: boolean, choice: multipleBirth}
      
+ ```
+ 
+ ```yaml
+@package: 
+  name: us-core
+  version: ?
+  url: http://hl7.org/fhir/us/core
+us-core-patient:
+  type: profile
+  base: fhir.Patient
+  require: [identifier, name]
+  elements:
+     extension: 
+        race: { type: us-core-race }
+     identifier: { require: [system, value] }
+     name: { min: 1 }
+  
  ```
