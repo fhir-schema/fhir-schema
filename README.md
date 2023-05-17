@@ -1,5 +1,6 @@
 # FHIR Schema
 
+## 1. Intro
 FHIR Schema is a project designed to simplify the implementation and validation of FHIR (Fast Healthcare Interoperability Resources) resources across different programming languages. It is heavily inspired by the design of JSON Schema and introduces a more developer-friendly representation of FHIR StructureDefinitions.
 
 Key features of FHIR Schema include:
@@ -10,6 +11,8 @@ Key features of FHIR Schema include:
 
 In summary, FHIR Schema is a  project that aims to make FHIR more accessible and easier to work with for developers, potentially leading to improved interoperability of healthcare systems.
 
+
+## 2. Specification
 
 
 ```yaml
