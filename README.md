@@ -1,11 +1,11 @@
 # FHIR Schema
 
 FHIR Schema is a framework to implement FHIR validation, 
-inspired by design of JSON Schema. 
+inspired by design of JSON Schema and to be a source of metadata for FHIRPath and CQL implementations.
 
 
 It introduces JSON Schema-like representation of the FHIR StructureDefinition
-and simplifies the process of implementing FHIR validation.  
+and simplifies the process of implementing FHIR validation.
 
 ```yaml
 @package: 
