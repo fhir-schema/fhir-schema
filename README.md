@@ -1,11 +1,16 @@
 # FHIR Schema
 
-FHIR Schema is a framework to implement FHIR validation, 
-inspired by design of JSON Schema and to be a source of metadata for FHIRPath and CQL implementations.
+FHIR Schema is a project designed to simplify the implementation and validation of FHIR (Fast Healthcare Interoperability Resources) resources across different programming languages. It is heavily inspired by the design of JSON Schema and introduces a more developer-friendly representation of FHIR StructureDefinitions.
+
+Key features of FHIR Schema include:
+
+* **Simplified Structure**: FHIR Schema represents FHIR resources and their elements in a more straightforward and intuitive manner compared to FHIR StructureDefinition. Each element is represented as a property of the resource with its type specified directly, which is similar to how data structures are typically defined in programming languages.
+* **Nested Elements**: FHIR Schema provides a clear and simple way to represent and validate nested elements in FHIR resources, which is a key requirement for many healthcare data use cases.
+* **Clear Implementation Semantics**: FHIR Schema provides clear semantics for implementing FHIR validation rules, which can make it easier for developers to create robust and reliable FHIR implementations.
+
+In summary, FHIR Schema is a  project that aims to make FHIR more accessible and easier to work with for developers, potentially leading to improved interoperability of healthcare systems.
 
 
-It introduces JSON Schema-like representation of the FHIR StructureDefinition
-and simplifies the process of implementing FHIR validation.
 
 ```yaml
 @package: 
