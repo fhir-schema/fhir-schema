@@ -8,11 +8,20 @@ Key features of FHIR Schema include:
 * **Simplified Structure**: FHIR Schema represents FHIR resources and their elements in a more straightforward and intuitive manner compared to FHIR StructureDefinition. Each element is represented as a property of the resource with its type specified directly, which is similar to how data structures are typically defined in programming languages.
 * **Nested Elements**: FHIR Schema provides a clear and simple way to represent and validate nested elements in FHIR resources, which is a key requirement for many healthcare data use cases.
 * **Clear Implementation Semantics**: FHIR Schema provides clear semantics for implementing FHIR validation rules, which can make it easier for developers to create robust and reliable FHIR implementations.
+* **Source of metadata** for FHIRPath, CQL and code-generation
+
 
 In summary, FHIR Schema is a  project that aims to make FHIR more accessible and easier to work with for developers, potentially leading to improved interoperability of healthcare systems.
 
 
 ## 2. Specification
+
+Ideas:
+
+* IG is a one JSON object (aka OpenAPI document)
+* Local refs by name
+* Validation by differentials (no snapshots)
+* Snapshot as merge operation
 
 
 ```yaml
@@ -66,14 +75,24 @@ Patient:
   url: http://hl7.org/fhir/us/core
 us-core-patient:
   type: profile
-  base: fhir.Patient
+  base: fhir.Patient # ref to fhir ig
   require: [identifier, name]
   elements:
      extension: 
-        race: { type: us-core-race }
+        race: { type: us-core-race } # local ref
      identifier: { require: [system, value] }
      name: { min: 1 }
-  
+us-core-vital-signs
+  type: profile
+  elements:
+     status: {type: code}
+     category:
+       # slicing index by name, filter by pattern and apply schema
+       slices:
+          VSCat:
+            pattern: {coding: {system: '....', code: 'vital-signs'}}
+            schema: {...}
+
  ```
 ## package document
 
