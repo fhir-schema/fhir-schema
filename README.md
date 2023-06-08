@@ -103,6 +103,12 @@ us-core-patient:
        'http://hl7.org/fhir/us/core/StructureDefinition/us-core-race': { type: us-core-race, min: ?, max: ? }
      identifier: { require: [system, value] }
      name: { min: 1 }
+us-core-race:
+  type: extension
+  extension:
+    ombCategory: { array: true, elements: {valueCoding: ...}}
+    detailed: { }
+    text: { }
 us-core-vital-signs
   type: profile
   elements:
