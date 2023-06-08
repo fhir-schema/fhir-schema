@@ -1,5 +1,15 @@
 # FHIR Schema
 
+## 0. Motivation
+
+* there is only 1.5 implementation of FHIR validation
+* we need more in different languages
+* everybody doing the same while implementing, and it looks very like JSON schema than StructureDef
+  * most of implementers do convert SD to nested data structure
+  * identify arrays
+  * resolve all references
+
+
 ## 1. Intro
 FHIR Schema is a project designed to simplify the implementation and validation of FHIR (Fast Healthcare Interoperability Resources) resources across different programming languages. It is heavily inspired by the design of JSON Schema and introduces a more developer-friendly representation of FHIR StructureDefinitions.
 
