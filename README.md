@@ -148,7 +148,7 @@ array of required elements
 
 ```js
 {
-  require: [code, system]
+  require: ['code', 'system'],
   elements: {code: ..., system:...}
 }
 ```
