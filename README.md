@@ -182,9 +182,9 @@ Label arrays for easy lookup
 { elements: { name: {array: true, type: HumanName}}}
 ```
 
-### 3.8 min & max keyword
+### 3.8 min & max keyword (min/maxItems in JSON Schema)
 
-For arrays **min** and **max** items in array
+Only for arrays defines **min** and **max** number of items
 
 ### 3.9 slicing keyword
 
