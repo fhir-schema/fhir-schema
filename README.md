@@ -93,7 +93,7 @@ Patient:
 us-core-patient:
   kind: profile
   type: fhir/Patient # ref to fhir ig
-  require: [identifier, name]
+  required: [identifier, name]
   elements:
      extension: 
         race: { type: us-core-race } # local ref
@@ -101,7 +101,7 @@ us-core-patient:
      extension:
        # <url>: <schema>
        'http://hl7.org/fhir/us/core/StructureDefinition/us-core-race': { type: us-core-race, min: ?, max: ? }
-     identifier: { require: [system, value] }
+     identifier: { required: [system, value] }
      name: { min: 1 }
 us-core-race:
   type: Extension
@@ -149,13 +149,13 @@ object of elements
 }
 ```
 
-### 3.4 require keyword
+### 3.4 required keyword
 
 array of required elements
 
 ```js
 {
-  require: ['code', 'system'],
+  required: ['code', 'system'],
   elements: {code: ..., system:...}
 }
 ```
