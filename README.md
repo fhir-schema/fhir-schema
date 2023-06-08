@@ -167,7 +167,7 @@ resolved reference to valueset `<package>/<name>`
 ```js
 {
   elements: {
-    type: { binding: {strength: ..., valueset: ...}}
+    code: { binding: {strength: ..., valueset: ...}}
   }
 }
 ```
