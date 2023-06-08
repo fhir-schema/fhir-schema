@@ -6,8 +6,8 @@
 * we need more in different languages
 * everybody doing the same while implementing, and it looks very like JSON schema than StructureDef
   * most of implementers do convert SD to nested data structure
-  * identify arrays
-  * resolve all references
+  * care about arrays (max: *)
+  * resolve references to machine readable
 * snapshots is implementation detail leaking into standard, only-differential validation sounds better
 * People need simple source of metadata for code-generation and FHIRPath
 
