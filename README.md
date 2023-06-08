@@ -142,8 +142,8 @@ object of elements
 ```js
 {elements:  { 
   <name>: <schema>,
-  family: {},
-  given: {}}}
+  family: {type: string},
+  given: {type: string, array: true}}}
 ```
 
 ### 3.4 require keyword
