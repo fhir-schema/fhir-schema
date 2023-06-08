@@ -47,23 +47,23 @@ Ideas:
   version: 5.0.0
   url: http://hl7.fhir.org
 HumanName:
-  type: complex-type
+  kind: complex-type
   elements:
      family: {type: string}
      given:  {type: string, array: true}
 Resource:
-  type: abstract-resource
+  kind: abstract-resource
   elements:
     id: {type: id}
 DomainResource:
-  type: abstract-resource
-  base: Resource
+  kind: abstract-resource
+  type: Resource
   elements:
     text: {type: Narrative }
     containted: {type: Resource, array: true}
 Patient:
-  type: resource
-  base: DomainResource
+  kind: resource
+  type: DomainResource
   elements:
       identifier: {type: Identifier, array: true, summary: true}
       active:     {type: boolean}
@@ -91,8 +91,8 @@ Patient:
   version: ?
   url: http://hl7.org/fhir/us/core
 us-core-patient:
-  type: profile
-  base: fhir.Patient # ref to fhir ig
+  kind: profile
+  type: fhir/Patient # ref to fhir ig
   require: [identifier, name]
   elements:
      extension: 
@@ -104,10 +104,10 @@ us-core-patient:
      identifier: { require: [system, value] }
      name: { min: 1 }
 us-core-race:
-  type: extension
+  type: Extension
   extension:
-    ombCategory: { array: true, elements: {valueCoding: ...}}
-    detailed: { }
+    ombCategory: { array: true, elements: {valueCoding: {...}}}
+    detailed: {valueString: {...} }
     text: { }
 us-core-vital-signs
   type: profile
@@ -127,24 +127,100 @@ us-core-vital-signs
 
 ## 3 Keywords
 
-### 3.1 base keyword
+### 3.1 kind keyword
+
+resource | profile | logical | extension
 
 ### 3.2 type keyword
 
+reference to base schema or type of element
+
 ### 3.3 elements keyword
+
+object of elements
+```js
+{ <name>: <schema> }
+```
 
 ### 3.4 require keyword
 
+array of required elements
+
+```js
+{
+  require: [code, system]
+  elements: {code: ..., system:...}
+}
+```
+
 ### 3.5 binding keyword
+
+resolved reference to valueset `<package>/<name>`
+
+```js
+{
+  elements: {
+    type: { binding: {strength: ..., valueset: ...}}
+  }
+}
+```
 
 ### 3.6 enum keyword
 
+For fixed and required bindings with type code enumerate values. Same semantic as JSON Schema **enum**
+
+```js
+{ elements: { gender: {enum: ['male','female']}}}
+
+```
+
 ### 3.7 array keyword
+
+Label arrays for easy lookup
+
+```js
+{ elements: { name: {array: true, type: HumanName}}}
+```
 
 ### 3.8 min & max keyword
 
-### 3.9 slices keyword
+For arrays **min** and **max** items in array
+
+### 3.9 slicing keyword
+
+Slices are indexed by name to provide **merge** semantic for reslicing.
+
+Slicing evaluation: filter by <pattern> and apply schema
+
+```js
+identifiers: {
+  slicing: {
+      <slice-name>: {pattern: <pattern>, schema: <schema>, min: ?, max: ?}
+  }
+ }
+```
 
 ### 3.10 choices & element keyword
+       
+Choice elements <prefix><type> are presented twice as only <prefix> and as <prefixType>, so depending
+on your needs you can jump between each others. For example while validationg json you will lookup schema
+by data element name in popstixed form (multipleBithInteger), but in FHIRPath `multipleBith.typeOf(?)`  you will do this 
+in a different direction.
+       
+```js
+{ multipleBirth: {choices: [multipleBirthInteger,  multipleBirthBoolean]}
+  multipleBirthInteger: {type: integer, choiceOf: multipleBirth}
+  multipleBirthBoolean: {type: boolean, choiceOf: multipleBirth}}
+```       
 
-### 3.11 recur keyword (elementReference)
+### 3.11 elementReference
+
+```yaml
+id: Questionaire
+elements: 
+  item:
+    elements:
+       ...
+       item: { elementReference: [Questionaire, elements, item] }
+```
+        
