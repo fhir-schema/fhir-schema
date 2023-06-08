@@ -8,7 +8,7 @@
   * most of implementers do convert SD to nested data structure
   * identify arrays
   * resolve all references
-* snapshots is implementation detail leaking into standard
+* snapshots is implementation detail leaking into standard, only-differential validation sounds better
 * People need simple source of metadata for code-generation and FHIRPath
 
 ## 1. Intro
@@ -22,7 +22,10 @@ Key features of FHIR Schema include:
 * **Clear Implementation Semantics**: FHIR Schema provides clear semantics for implementing FHIR validation rules, which can make it easier for developers to create robust and reliable FHIR implementations.
 * **Source of metadata** for FHIRPath, CQL and code-generation
 * **Comprehensive test's suite for implemers** unit tests collection to facilitate validators implementation (like [JSON Schema](https://github.com/json-schema-org/JSON-Schema-Test-Suite))
-* **IG File** compact representation of IG as one json.gz file with only important fields, so metadata can be loaded by runtime in miliseconds over network at start.
+* **IG File** compact representation of IG as one json.gz file with only important fields, so metadata can be loaded by runtime in miliseconds over network at start
+* **Logical Models** first-class support - validation of logical models
+* **FHS** first-class support - direct compilation of FSH into FHIR Schema
+
 
 In summary, FHIR Schema is a  project that aims to make FHIR more accessible and easier to work with for developers, potentially leading to improved interoperability of healthcare systems.
 
