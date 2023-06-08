@@ -2,12 +2,12 @@
 
 ## 0. Motivation
 
-* there is only 1.5 implementation of FHIR validation
-* we need more in different languages
-* everybody doing the same while implementing, and it looks very like JSON schema than StructureDef
+* there are only few implementations of FHIR validation - why? because it's hard, no unit-tests, esoteric knowledge
+* we need more in different languages python, js, golang, rust etc
+* every implementers doing similar transformtions to SD (it looks very like JSON schema than StructureDef)
   * most of implementers do convert SD to nested data structure
   * care about arrays (max: *)
-  * resolve references to machine readable
+  * resolve references
 * snapshots is implementation detail leaking into standard, only-differential validation sounds better
 * People need simple source of metadata for code-generation and FHIRPath
 
