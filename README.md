@@ -140,10 +140,13 @@ reference to base schema or type of element
 object of elements
 
 ```js
-{elements:  { 
-  <name>: <schema>,
-  family: {type: string},
-  given: {type: string, array: true}}}
+{
+  elements:  { 
+    <name>: <schema>,
+    family: {type: string},
+    given: {type: string, array: true}
+  }
+}
 ```
 
 ### 3.4 require keyword
