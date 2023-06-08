@@ -8,7 +8,8 @@
   * most of implementers do convert SD to nested data structure
   * identify arrays
   * resolve all references
-
+* snapshots is implementation detail leaking into standard
+* People need simple source of metadata for code-generation and FHIRPath
 
 ## 1. Intro
 FHIR Schema is a project designed to simplify the implementation and validation of FHIR (Fast Healthcare Interoperability Resources) resources across different programming languages. It is heavily inspired by the design of JSON Schema and introduces a more developer-friendly representation of FHIR StructureDefinitions.
