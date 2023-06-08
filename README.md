@@ -138,8 +138,12 @@ reference to base schema or type of element
 ### 3.3 elements keyword
 
 object of elements
+
 ```js
-{ <name>: <schema> }
+{elements:  { 
+  <name>: <schema>,
+  family: {},
+  given: {}}}
 ```
 
 ### 3.4 require keyword
