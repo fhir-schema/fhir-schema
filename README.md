@@ -1,6 +1,7 @@
 # FHIR Schema
 
-* [Join chat](https://chat.fhir.org/#narrow/stream/391879-FHIR-Schema)
+* [Support chat](https://chat.fhir.org/#narrow/stream/391879-FHIR-Schema)
+* [Weekly meetings](TODO)
 
 ## 0. Motivation
 
@@ -12,6 +13,7 @@
   * resolve references
 * snapshots is implementation detail leaking into standard, only-differential validation sounds better
 * People need simple source of metadata for code-generation and FHIRPath
+
 
 ## 1. Intro
 
@@ -32,6 +34,7 @@ Key features of FHIR Schema include:
 * **IG File** compact representation of IG as one json.gz file with only important fields, so metadata can be loaded by runtime in miliseconds over network at start
 * **Logical Models** first-class support - validation of logical models
 * **FHS** first-class support - direct compilation of FSH into FHIR Schema
+* **Package** provides one file package with FHIR Schema and how deps are resolved
 
 
 In summary, FHIR Schema is a  project that aims to make FHIR more accessible and easier to work with for developers, potentially leading to improved interoperability of healthcare systems.
@@ -72,24 +75,23 @@ Patient:
   kind: resource
   type: DomainResource
   elements:
-      identifier: {type: Identifier, array: true, summary: true}
-      active:     {type: boolean}
-      name:       {type: HumanName, array: true}
-      gender:     {type: code, enum: ['male','female','other']}
-      # nested elements
-      contact:
-         type: BackboneElement
-         elements:
-            relationship: {type: CodeableConcept, binding: {...}}
-            name:         {type: HumanName }
-            #...
-            organization: {type: Reference, refers: [Organization]}
-       # choice type
-       multipleBirth:
-         choices: [integer, boolean]
-       multipleBirthInteger: {type: integer, element: multipleBirth}
-       multipleBirthBoolean: {type: boolean, element: multipleBirth}
-     
+    identifier: {type: Identifier, array: true, summary: true}
+    active:     {type: boolean}
+    name:       {type: HumanName, array: true}
+    gender:     {type: code, enum: ['male','female','other']}
+    # nested elements
+    contact:
+       type: BackboneElement
+       elements:
+          relationship: {type: CodeableConcept, binding: {...}}
+          name:         {type: HumanName }
+          #...
+          organization: {type: Reference, refers: [Organization]}
+     # choice type
+     multipleBirth:
+       choices: [integer, boolean]
+     multipleBirthInteger: {type: integer, element: multipleBirth}
+     multipleBirthBoolean: {type: boolean, element: multipleBirth}
  ```
  
  ```yaml
@@ -249,3 +251,17 @@ constraint:
   <key>: {<id>: {severity: <>, human: <>, expression: <>}}
 
 ```
+
+
+## License
+
+FHIR® is the registered trademark of HL7 and is used with the permission of HL7.
+Use of the FHIR trademark does not constitute endorsement of the contents of
+this repository by HL7, nor affirmation that this data is conformant to the
+various applicable standards
+
+## Credits
+
+* Nikolai Ryzhikov @niquola (Health Samurai)
+* Ewout Kramer (Firely)
+* FHIR Community - https://chat.fhir.org/

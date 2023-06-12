@@ -1,10 +1,10 @@
 {"title": "Test elements keyword",
  "schema":
- {"@meta": {"id": "fhir"}
+ {"@package": {"id": "fhir", "version": "1.0.1"}
   ,
   "Resource": {"elements": {"id": {"type": "id"}}}
   ,
-  "Patient":  {"elements": {"birthDate": {"type": "birthDate"}}}}
+  "Patient":  {"elements": {"birthDate": {"type": "date"}}}}
  ,
  "tests":[
      {"data": {"resourceType": "Resource", "id": "just-id"},
