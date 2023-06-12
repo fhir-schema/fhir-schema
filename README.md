@@ -136,6 +136,20 @@ us-core-vital-signs
 
 ## 3 Keywords
 
+### 3.0 order keyword
+
+Order is integer to keep FHIR elements original order
+
+```js
+{
+  id: HumanName,
+  elements:  {
+    family: {type: string, order: 1},
+    given:  {type: string, array: true, order: 2}
+  }
+}
+```
+
 ### 3.1 kind keyword
 
 resource | profile | logical | extension
