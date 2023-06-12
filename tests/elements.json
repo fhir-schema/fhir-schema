@@ -1,0 +1,22 @@
+{"title": "Test elements keyword",
+ "schema":
+ {"@meta": {"id": "fhir"}
+  ,
+  "Resource": {"elements": {"id": {"type": "id"}}}
+  ,
+  "Patient":  {"elements": {"birthDate": {"type": "birthDate"}}}}
+ ,
+ "tests":[
+     {"data": {"resourceType": "Resource", "id": "just-id"},
+      "valid": true}
+     ,
+     {"data": {"resourceType": "Resource", "ups": "just-id"},
+      "errors": [{"code": "unknown-element", "path": "ups"}]}
+     ,
+     {"data": {"resourceType": "Patient", "id": "just-id"},
+      "valid": true}
+     ,
+     {"data": {"resourceType": "Patient", "ups": "just-id"},
+      "errors": [{"code": "unknown-element", "path": "ups"}]}
+ ]
+}

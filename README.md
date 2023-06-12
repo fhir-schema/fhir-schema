@@ -1,5 +1,7 @@
 # FHIR Schema
 
+* [Join chat](https://chat.fhir.org/#narrow/stream/391879-FHIR-Schema)
+
 ## 0. Motivation
 
 * there are only few implementations of FHIR validation - why? because it's hard, no unit-tests, esoteric knowledge
@@ -12,7 +14,12 @@
 * People need simple source of metadata for code-generation and FHIRPath
 
 ## 1. Intro
-FHIR Schema is a project designed to simplify the implementation and validation of FHIR (Fast Healthcare Interoperability Resources) resources across different programming languages. It is heavily inspired by the design of JSON Schema and introduces a more developer-friendly representation of FHIR StructureDefinitions.
+
+FHIR Schema is a project designed to simplify the implementation and validation
+of FHIR (Fast Healthcare Interoperability Resources) resources across different
+programming languages. It is heavily inspired by the design of JSON Schema and
+introduces a more developer-friendly representation of FHIR
+StructureDefinitions.
 
 Key features of FHIR Schema include:
 
@@ -42,7 +49,7 @@ Ideas:
 
 
 ```yaml
-@package: 
+@package:
   name: fhir
   version: 5.0.0
   url: http://hl7.fhir.org
@@ -133,7 +140,8 @@ resource | profile | logical | extension
 
 ### 3.2 type keyword
 
-reference to base schema or type of element
+Reference to base schema or type of element.
+FHIR Schema supports all FHIR primitive types.
 
 ### 3.3 elements keyword
 
@@ -141,7 +149,7 @@ object of elements
 
 ```js
 {
-  elements:  { 
+  elements:  {
     <name>: <schema>,
     family: {type: string},
     given: {type: string, array: true}
@@ -224,10 +232,20 @@ in a different direction.
 
 ```yaml
 id: Questionaire
-elements: 
+elements:
   item:
     elements:
        ...
        item: { elementReference: [Questionaire, elements, item] }
 ```
-        
+
+### 3.12 constraint
+
+"constraint" is object of FHIRPath rules
+
+```yaml
+id: Resource
+constraint:
+  <key>: {<id>: {severity: <>, human: <>, expression: <>}}
+
+```
