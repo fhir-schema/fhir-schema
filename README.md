@@ -336,7 +336,74 @@ bar: {
     address: {
       slicing: {
         slices: {a: {reslice: 'homeaddress', max: 2, match: {type: 'pattern', value: {text: 'foo'}}}}}}}}
+```
+### 4.2 FHIR R4 Patient
 
+```js
+{
+  id: 'Patient',
+  base: 'http://hl7.org/fhir/StructureDefinition/DomainResource',
+  kind: 'resource',
+  type: 'Patient',
+  derivation: 'specialization',
+  elements: {
+    deceased: {choices: ['deceasedBoolean', 'deceasedDateTime'], scalar: true},
+    deceasedBoolean: { modifier: true, type: 'boolean', summary: true, scalar: true, choiceOf: 'deceased'},
+    deceasedDateTime: {modifier: true, type: 'dateTime', summary: true, scalar: true, choiceOf: 'deceased'},
+    maritalStatus: {type: 'CodeableConcept', scalar: true,
+                    binding: {valueSet: 'http://hl7.org/fhir/ValueSet/marital-status', strength: 'extensible'},},
+    managingOrganization: {refers: ['http://hl7.org/fhir/StructureDefinition/Organization',], type: 'Reference', summary: true, scalar: true,},
+    gender: {type: 'code', summary: true, scalar: true,
+             binding: {valueSet: 'http://hl7.org/fhir/ValueSet/administrative-gender', strength: 'required'}},
+    multipleBirth: {choices: ['multipleBirthBoolean', 'multipleBirthInteger'], scalar: true},
+    multipleBirthInteger: {type: 'integer', scalar: true, choiceOf: 'multipleBirth'},
+    multipleBirthBoolean: {type: 'boolean', scalar: true, choiceOf: 'multipleBirth'},
+    name: {type: 'HumanName', array: true, summary: true},
+    birthDate: {type: 'date', summary: true, scalar: true},
+    address: {type: 'Address', array: true, summary: true},
+    identifier: {type: 'Identifier', array: true, summary: true},
+    telecom: {type: 'ContactPoint', array: true, summary: true},
+    active: {modifier: true, type: 'boolean', summary: true, scalar: true},
+    photo: {type: 'Attachment', array: true},
+    link: {
+      required: ['type', 'other'], modifier: true, type: 'BackboneElement', summary: true, array: true,
+      elements: {
+        other: {type: 'Reference', summary: true, scalar: true,
+                refers: ['http://hl7.org/fhir/StructureDefinition/Patient', 'http://hl7.org/fhir/StructureDefinition/RelatedPerson']},
+        type: {type: 'code', summary: true, scalar: true,
+               binding: {valueSet: 'http://hl7.org/fhir/ValueSet/link-type', strength: 'required'}}}},
+    communication: {
+      type: 'BackboneElement',
+      required: ['language'],
+      array: true,
+      elements: {
+        language: {type: 'CodeableConcept', scalar: true,
+                   binding: {valueSet: 'http://hl7.org/fhir/ValueSet/languages', strength: 'preferred'}},
+        preferred: {type: 'boolean', scalar: true},
+      }
+    },
+    generalPractitioner: {type: 'Reference', array: true,
+                          refers: ['http://hl7.org/fhir/StructureDefinition/Organization',
+                                   'http://hl7.org/fhir/StructureDefinition/Practitioner',
+                                   'http://hl7.org/fhir/StructureDefinition/PractitionerRole']},
+    contact: {
+      constraints: {
+        'pat-1': {
+          human: "SHALL at least contain a contact's details or a reference to an organization",
+          severity: 'error',
+          expression: 'name.exists() or telecom.exists() or address.exists() or organization.exists()'}},
+      type: 'BackboneElement',
+      array: true,
+      elements: {
+        relationship: {type: 'CodeableConcept', array: true,
+                       binding: {valueSet: 'http://hl7.org/fhir/ValueSet/patient-contactrelationship', strength: 'extensible'}},
+        name: {type: 'HumanName', scalar: true},
+        telecom: {type: 'ContactPoint', array: true},
+        address: {type: 'Address', scalar: true},
+        gender: {type: 'code', scalar: true,
+                 binding: {valueSet: 'http://hl7.org/fhir/ValueSet/administrative-gender', strength: 'required'}},
+        organization: {refers: ['http://hl7.org/fhir/StructureDefinition/Organization'], type: 'Reference', scalar: true},
+        period: {type: 'Period', scalar: true}}}}}
 ```
 
 
