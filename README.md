@@ -184,7 +184,17 @@ array of required elements
 }
 ```
 
-### 3.5 binding keyword
+### 3.5 excluded keyword
+
+array of excluded elements
+
+```js
+{
+  excluded: ['code', 'system']
+}
+```
+
+### 3.6 binding keyword
 
 resolved reference to valueset `<package>/<name>`
 
@@ -196,7 +206,7 @@ resolved reference to valueset `<package>/<name>`
 }
 ```
 
-### 3.6 enum keyword
+### 3.7 enum keyword
 
 For fixed and required bindings with type code enumerate values. Same semantic as JSON Schema **enum**
 
@@ -205,7 +215,7 @@ For fixed and required bindings with type code enumerate values. Same semantic a
 
 ```
 
-### 3.7 array keyword
+### 3.8 array keyword
 
 Label arrays for easy lookup
 
@@ -213,11 +223,11 @@ Label arrays for easy lookup
 { elements: { name: {array: true, type: HumanName}}}
 ```
 
-### 3.8 min & max keyword (min/maxItems in JSON Schema)
+### 3.9 min & max keyword (min/maxItems in JSON Schema)
 
 Only for arrays defines **min** and **max** number of items
 
-### 3.9 slicing keyword
+### 3.10 slicing keyword
 
 Slices are indexed by name to provide **merge** semantic for reslicing.
 
@@ -226,12 +236,25 @@ Slicing evaluation: filter by <pattern> and apply schema
 ```js
 identifiers: {
   slicing: {
-      <slice-name>: {pattern: <pattern>, schema: <schema>, min: ?, max: ?}
+      <slice-name>: {match: <match>, schema: <schema>, min: ?, max: ?, order: ?, sliceIsConstraining: <boolean>, reslice: <resliced-slice-name>}
   }
  }
 ```
 
-### 3.10 choices & element keyword
+#### 3.10.1 slicing.match keyword
+
+Describes pattern for slice match.
+
+```js
+{
+  type: "pattern | binding | profile | type | union-type",
+  resolve-ref: <boolean>,
+  value: <match-pattern>
+}
+```
+
+
+### 3.11 choices & element keyword
        
 Choice elements <prefix><type> are presented twice as only <prefix> and as <prefixType>, so depending
 on your needs you can jump between each others. For example while validationg json you will lookup schema
@@ -244,7 +267,7 @@ in a different direction.
   multipleBirthBoolean: {type: boolean, choiceOf: multipleBirth}}
 ```       
 
-### 3.11 elementReference
+### 3.12 elementReference
 
 ```yaml
 id: Questionaire
@@ -255,7 +278,7 @@ elements:
        item: { elementReference: [Questionaire, elements, item] }
 ```
 
-### 3.12 constraint
+### 3.13 constraint
 
 "constraint" is object of FHIRPath rules
 
@@ -277,5 +300,7 @@ various applicable standards
 ## Credits
 
 * Nikolai Ryzhikov @niquola (Health Samurai)
+* Evgeny Mukha @ApricotLace (Health Samurai)
+* Ivan Bagrov @Panthevm (Health Samurai)
 * Ewout Kramer (Firely)
 * FHIR Community - https://chat.fhir.org/
