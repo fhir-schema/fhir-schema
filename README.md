@@ -316,6 +316,29 @@ constraint:
 
 ```
 
+## 4 Examples
+
+### 4.1 Re-slicing
+
+```js
+foo: {
+  base: 'http://hl7.org/fhir/StructureDefinition/Patient',
+  type: 'Patient',
+  elements: {
+    address: {
+      slicing: {
+        rules: 'closed',
+        slices: {homeaddress: {min: 1, match: {type: 'pattern', value: {use: 'home'}}}}}}}}
+bar: {
+  base: 'foo',
+  type: 'Patient',
+  elements: {
+    address: {
+      slicing: {
+        slices: {a: {reslice: 'homeaddress', max: 2, match: {type: 'pattern', value: {text: 'foo'}}}}}}}}
+
+```
+
 
 ## License
 
