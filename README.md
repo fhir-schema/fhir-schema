@@ -215,12 +215,22 @@ For fixed and required bindings with type code enumerate values. Same semantic a
 
 ```
 
-### 3.8 array keyword
+### 3.8 Container labels
+
+#### 3.8.1 array
 
 Label arrays for easy lookup
 
 ```js
 { elements: { name: {array: true, type: HumanName}}}
+```
+
+#### 3.8.1 scalar
+
+Label scalar elements (derivation: constraint + max 1)
+
+```js
+{ elements: { gender: {scalar: true, type: code}}}
 ```
 
 ### 3.9 min & max keyword (min/maxItems in JSON Schema)
@@ -229,14 +239,20 @@ Only for arrays defines **min** and **max** number of items
 
 ### 3.10 slicing keyword
 
-Slices are indexed by name to provide **merge** semantic for reslicing.
-
 Slicing evaluation: filter by <pattern> and apply schema
+
+**sliceIsConstraining**: if slice constraining existing slice with same name
+**reslice**: name of slice that being resliced
 
 ```js
 identifiers: {
   slicing: {
-      <slice-name>: {match: <match>, schema: <schema>, min: ?, max: ?, order: ?, sliceIsConstraining: <boolean>, reslice: <resliced-slice-name>}
+      discriminator: <slicing.discriminator from ElementDefinition>
+      oredered: <boolean>
+      rules: "open | closed | openAtEnd"
+      slices: {
+        <slice-name>: {match: <match>, schema: <schema>, min: ?, max: ?, order: ?, sliceIsConstraining: <boolean>, reslice: <resliced-slice-name>}
+      }
   }
  }
 ```
@@ -244,6 +260,17 @@ identifiers: {
 #### 3.10.1 slicing.match keyword
 
 Describes pattern for slice match.
+
+**type**:
+  pattern — regular pattern matching
+  binding — coded value valid against provided binding
+  profile — data element valid against provided profile
+  type — resourceType / reference type check
+  union-type — specific union sub-type present
+
+**resolve-ref**: parameter that indicates whether a resolved reference is required to match this slice or not
+
+**value**: pattern match values, see Examples
 
 ```js
 {
