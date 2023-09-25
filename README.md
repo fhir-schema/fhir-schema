@@ -45,94 +45,12 @@ In summary, FHIR Schema is a  project that aims to make FHIR more accessible and
 
 Ideas:
 
-* IG is a one JSON object (aka OpenAPI document)
-* Local refs by name
+* IG is a one ndjson/ndedn object
+* Local refs by FQN
 * Validation by differentials (no snapshots)
-* Snapshot as merge operation
 
-
-```yaml
-@package:
-  name: fhir
-  version: 5.0.0
-  url: http://hl7.fhir.org
-HumanName:
-  kind: complex-type
-  elements:
-     family: {type: string}
-     given:  {type: string, array: true}
-Resource:
-  kind: abstract-resource
-  elements:
-    id: {type: id}
-DomainResource:
-  kind: abstract-resource
-  type: Resource
-  elements:
-    text: {type: Narrative }
-    containted: {type: Resource, array: true}
-Patient:
-  kind: resource
-  type: DomainResource
-  elements:
-    identifier: {type: Identifier, array: true, summary: true}
-    active:     {type: boolean}
-    name:       {type: HumanName, array: true}
-    gender:     {type: code, enum: ['male','female','other']}
-    # nested elements
-    contact:
-       type: BackboneElement
-       elements:
-          relationship: {type: CodeableConcept, binding: {...}}
-          name:         {type: HumanName }
-          #...
-          organization: {type: Reference, refers: [Organization]}
-     # choice type
-     multipleBirth:
-       choices: [integer, boolean]
-     multipleBirthInteger: {type: integer, element: multipleBirth}
-     multipleBirthBoolean: {type: boolean, element: multipleBirth}
- ```
- 
- ```yaml
-@package: 
-  name: us-core
-  version: ?
-  url: http://hl7.org/fhir/us/core
-us-core-patient:
-  kind: profile
-  type: fhir/Patient # ref to fhir ig
-  required: [identifier, name]
-  elements:
-     extension: 
-        race: { type: us-core-race } # local ref
-     # or
-     extension:
-       # <url>: <schema>
-       'http://hl7.org/fhir/us/core/StructureDefinition/us-core-race': { type: us-core-race, min: ?, max: ? }
-     identifier: { required: [system, value] }
-     name: { min: 1 }
-us-core-race:
-  type: Extension
-  extension:
-    ombCategory: { array: true, elements: {valueCoding: {...}}}
-    detailed: {valueString: {...} }
-    text: { }
-us-core-vital-signs
-  type: profile
-  elements:
-     status: {type: code}
-     category:
-       # slicing index by name, filter by pattern and apply schema
-       slices:
-          VSCat:
-            pattern: {coding: {system: '....', code: 'vital-signs'}}
-            schema: {...}
-
- ```
-## package document
-
-### @package keyword
+### 2.0 FQN — Fully Qualified Name
+FQN Pattern: <package-name>#<package-version>/<entity-id>
 
 ## 3 Keywords
 
