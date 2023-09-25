@@ -50,7 +50,7 @@ Ideas:
 * Validation by differentials (no snapshots)
 
 ### 2.0 FQN — Fully Qualified Name
-FQN Pattern: <package-name>#<package-version>/<entity-id>
+FQN Pattern: ```<package-name>#<package-version>/<entity-id>```
 
 ## 3 Keywords
 
