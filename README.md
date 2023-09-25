@@ -260,69 +260,91 @@ bar: {
 
 ```js
 {
-  id: 'Patient',
-  base: 'http://hl7.org/fhir/StructureDefinition/DomainResource',
-  kind: 'resource',
-  type: 'Patient',
-  derivation: 'specialization',
-  elements: {
-    deceased: {choices: ['deceasedBoolean', 'deceasedDateTime'], scalar: true},
-    deceasedBoolean: { modifier: true, type: 'boolean', summary: true, scalar: true, choiceOf: 'deceased'},
-    deceasedDateTime: {modifier: true, type: 'dateTime', summary: true, scalar: true, choiceOf: 'deceased'},
-    maritalStatus: {type: 'CodeableConcept', scalar: true,
-                    binding: {valueSet: 'http://hl7.org/fhir/ValueSet/marital-status', strength: 'extensible'},},
-    managingOrganization: {refers: ['http://hl7.org/fhir/StructureDefinition/Organization',], type: 'Reference', summary: true, scalar: true,},
-    gender: {type: 'code', summary: true, scalar: true,
-             binding: {valueSet: 'http://hl7.org/fhir/ValueSet/administrative-gender', strength: 'required'}},
-    multipleBirth: {choices: ['multipleBirthBoolean', 'multipleBirthInteger'], scalar: true},
-    multipleBirthInteger: {type: 'integer', scalar: true, choiceOf: 'multipleBirth'},
-    multipleBirthBoolean: {type: 'boolean', scalar: true, choiceOf: 'multipleBirth'},
-    name: {type: 'HumanName', array: true, summary: true},
-    birthDate: {type: 'date', summary: true, scalar: true},
-    address: {type: 'Address', array: true, summary: true},
-    identifier: {type: 'Identifier', array: true, summary: true},
-    telecom: {type: 'ContactPoint', array: true, summary: true},
-    active: {modifier: true, type: 'boolean', summary: true, scalar: true},
-    photo: {type: 'Attachment', array: true},
-    link: {
-      required: ['type', 'other'], modifier: true, type: 'BackboneElement', summary: true, array: true,
-      elements: {
-        other: {type: 'Reference', summary: true, scalar: true,
-                refers: ['http://hl7.org/fhir/StructureDefinition/Patient', 'http://hl7.org/fhir/StructureDefinition/RelatedPerson']},
-        type: {type: 'code', summary: true, scalar: true,
-               binding: {valueSet: 'http://hl7.org/fhir/ValueSet/link-type', strength: 'required'}}}},
-    communication: {
-      type: 'BackboneElement',
-      required: ['language'],
-      array: true,
-      elements: {
-        language: {type: 'CodeableConcept', scalar: true,
-                   binding: {valueSet: 'http://hl7.org/fhir/ValueSet/languages', strength: 'preferred'}},
-        preferred: {type: 'boolean', scalar: true},
-      }
+ "derivation": "specialization",
+ "type": "hl7.fhir.r4.core#4.0.1/Patient",
+ "elements": {
+  "identifier": {"type": "hl7.fhir.r4.core#4.0.1/Identifier", "array": true, "summary": true},
+  "active": {"modifier": true, "type": "hl7.fhir.r4.core#4.0.1/boolean", "summary": true, "scalar": true},
+  "name": {"type": "hl7.fhir.r4.core#4.0.1/HumanName", "array": true, "summary": true},
+  "telecom": {"type": "hl7.fhir.r4.core#4.0.1/ContactPoint", "array": true, "summary": true},
+  "gender": {
+   "type": "hl7.fhir.r4.core#4.0.1/code",
+   "summary": true,
+   "binding": {"valueSet": "http://hl7.org/fhir/ValueSet/administrative-gender", "strength": "required", "codesystems": ["http://hl7.org/fhir/administrative-gender"]},
+   "scalar": true
+  },
+  "deceasedBoolean": {"modifier": true, "type": "hl7.fhir.r4.core#4.0.1/boolean", "summary": true, "scalar": true, "choiceOf": "deceased"},
+  "deceasedDateTime": {"modifier": true, "type": "hl7.fhir.r4.core#4.0.1/dateTime", "summary": true, "scalar": true, "choiceOf": "deceased"},
+  "maritalStatus": {"type": "hl7.fhir.r4.core#4.0.1/CodeableConcept", "binding": {"valueSet": "http://hl7.org/fhir/ValueSet/marital-status", "strength": "extensible"}, "scalar": true},
+  "managingOrganization": {"refers": ["hl7.fhir.r4.core#4.0.1/Organization"], "type": "hl7.fhir.r4.core#4.0.1/Reference", "summary": true, "scalar": true},
+  "multipleBirth": {"choices": ["multipleBirthBoolean", "multipleBirthInteger"], "scalar": true},
+  "address": {"type": "hl7.fhir.r4.core#4.0.1/Address", "array": true, "summary": true},
+  "photo": {"type": "hl7.fhir.r4.core#4.0.1/Attachment", "array": true},
+  "link": {
+   "modifier": true,
+   "type": "hl7.fhir.r4.core#4.0.1/BackboneElement",
+   "array": true,
+   "elements": {
+    "other": {"refers": ["hl7.fhir.r4.core#4.0.1/Patient", "hl7.fhir.r4.core#4.0.1/RelatedPerson"], "type": "hl7.fhir.r4.core#4.0.1/Reference", "summary": true, "scalar": true},
+    "type": {
+     "type": "hl7.fhir.r4.core#4.0.1/code",
+     "summary": true,
+     "binding": {"valueSet": "http://hl7.org/fhir/ValueSet/link-type", "strength": "required", "codesystems": ["http://hl7.org/fhir/link-type"]},
+     "scalar": true
+    }
+   },
+   "summary": true,
+   "required": ["type", "other"]
+  },
+  "birthDate": {"type": "hl7.fhir.r4.core#4.0.1/date", "summary": true, "scalar": true},
+  "multipleBirthBoolean": {"type": "hl7.fhir.r4.core#4.0.1/boolean", "scalar": true, "choiceOf": "multipleBirth"},
+  "communication": {
+   "type": "hl7.fhir.r4.core#4.0.1/BackboneElement",
+   "array": true,
+   "elements": {
+    "language": {"type": "hl7.fhir.r4.core#4.0.1/CodeableConcept", "binding": {"valueSet": "http://hl7.org/fhir/ValueSet/languages", "strength": "preferred"}, "scalar": true},
+    "preferred": {"type": "hl7.fhir.r4.core#4.0.1/boolean", "scalar": true}
+   },
+   "required": ["language"]
+  },
+  "deceased": {"choices": ["deceasedBoolean", "deceasedDateTime"], "scalar": true},
+  "generalPractitioner": {
+   "refers": ["hl7.fhir.r4.core#4.0.1/Organization", "hl7.fhir.r4.core#4.0.1/Practitioner", "hl7.fhir.r4.core#4.0.1/PractitionerRole"],
+   "type": "hl7.fhir.r4.core#4.0.1/Reference",
+   "array": true
+  },
+  "contact": {
+   "constraints": {
+    "pat-1": {
+     "human": "SHALL at least contain a contact's details or a reference to an organization",
+     "severity": "error",
+     "expression": "name.exists() or telecom.exists() or address.exists() or organization.exists()"
+    }
+   },
+   "type": "hl7.fhir.r4.core#4.0.1/BackboneElement",
+   "array": true,
+   "elements": {
+    "relationship": {"type": "hl7.fhir.r4.core#4.0.1/CodeableConcept", "array": true, "binding": {"valueSet": "http://hl7.org/fhir/ValueSet/patient-contactrelationship", "strength": "extensible"}},
+    "name": {"type": "hl7.fhir.r4.core#4.0.1/HumanName", "scalar": true},
+    "telecom": {"type": "hl7.fhir.r4.core#4.0.1/ContactPoint", "array": true},
+    "address": {"type": "hl7.fhir.r4.core#4.0.1/Address", "scalar": true},
+    "gender": {
+     "type": "hl7.fhir.r4.core#4.0.1/code",
+     "binding": {"valueSet": "http://hl7.org/fhir/ValueSet/administrative-gender", "strength": "required", "codesystems": ["http://hl7.org/fhir/administrative-gender"]},
+     "scalar": true
     },
-    generalPractitioner: {type: 'Reference', array: true,
-                          refers: ['http://hl7.org/fhir/StructureDefinition/Organization',
-                                   'http://hl7.org/fhir/StructureDefinition/Practitioner',
-                                   'http://hl7.org/fhir/StructureDefinition/PractitionerRole']},
-    contact: {
-      constraints: {
-        'pat-1': {
-          human: "SHALL at least contain a contact's details or a reference to an organization",
-          severity: 'error',
-          expression: 'name.exists() or telecom.exists() or address.exists() or organization.exists()'}},
-      type: 'BackboneElement',
-      array: true,
-      elements: {
-        relationship: {type: 'CodeableConcept', array: true,
-                       binding: {valueSet: 'http://hl7.org/fhir/ValueSet/patient-contactrelationship', strength: 'extensible'}},
-        name: {type: 'HumanName', scalar: true},
-        telecom: {type: 'ContactPoint', array: true},
-        address: {type: 'Address', scalar: true},
-        gender: {type: 'code', scalar: true,
-                 binding: {valueSet: 'http://hl7.org/fhir/ValueSet/administrative-gender', strength: 'required'}},
-        organization: {refers: ['http://hl7.org/fhir/StructureDefinition/Organization'], type: 'Reference', scalar: true},
-        period: {type: 'Period', scalar: true}}}}}
+    "organization": {"refers": ["hl7.fhir.r4.core#4.0.1/Organization"], "type": "hl7.fhir.r4.core#4.0.1/Reference", "scalar": true},
+    "period": {"type": "hl7.fhir.r4.core#4.0.1/Period", "scalar": true}
+   }
+  },
+  "multipleBirthInteger": {"type": "hl7.fhir.r4.core#4.0.1/integer", "scalar": true, "choiceOf": "multipleBirth"}
+ },
+ "id": "Patient",
+ "kind": "resource",
+ "url": "http://hl7.org/fhir/StructureDefinition/Patient",
+ "base": "hl7.fhir.r4.core#4.0.1/DomainResource",
+ "fqn": "hl7.fhir.r4.core#4.0.1/Patient"
+}
 ```
 
 
