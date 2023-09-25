@@ -242,6 +242,7 @@ Only for arrays defines **min** and **max** number of items
 Slicing evaluation: filter by <pattern> and apply schema
 
 **sliceIsConstraining**: if slice constraining existing slice with same name
+
 **reslice**: name of slice that being resliced
 
 ```js
@@ -262,11 +263,11 @@ identifiers: {
 Describes pattern for slice match.
 
 **type**:
-  pattern — regular pattern matching
-  binding — coded value valid against provided binding
-  profile — data element valid against provided profile
-  type — resourceType / reference type check
-  union-type — specific union sub-type present
+  * pattern — regular pattern matching
+  * binding — coded value valid against provided binding
+  * profile — data element valid against provided profile
+  * type — resourceType / reference type check
+  * union-type — specific union sub-type present
 
 **resolve-ref**: parameter that indicates whether a resolved reference is required to match this slice or not
 
