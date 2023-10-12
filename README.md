@@ -292,6 +292,9 @@ elements:
       strength: required
       codesystems: [ http://hl7.org/fhir/administrative-gender ]
     scalar: true
+  deceased:
+    choices: [ deceasedBoolean, deceasedDateTime ]
+    scalar: true
   deceasedBoolean:
     modifier: true
     type: hl7.fhir.r4.core#4.0.1/boolean
@@ -311,13 +314,9 @@ elements:
       strength: extensible
     scalar: true
   managingOrganization:
-    refers:
-    - hl7.fhir.r4.core#4.0.1/Organization
+    refers: [ hl7.fhir.r4.core#4.0.1/Organization ]
     type: hl7.fhir.r4.core#4.0.1/Reference
     summary: true
-    scalar: true
-  multipleBirth:
-    choices: [ multipleBirthBoolean, multipleBirthInteger ]
     scalar: true
   address:
     type: hl7.fhir.r4.core#4.0.1/Address
@@ -350,14 +349,22 @@ elements:
     type: hl7.fhir.r4.core#4.0.1/date
     summary: true
     scalar: true
+  multipleBirth:
+    choices: [ multipleBirthBoolean, multipleBirthInteger ]
+    scalar: true
   multipleBirthBoolean:
     type: hl7.fhir.r4.core#4.0.1/boolean
+    scalar: true
+    choiceOf: multipleBirth
+  multipleBirthInteger:
+    type: hl7.fhir.r4.core#4.0.1/integer
     scalar: true
     choiceOf: multipleBirth
   communication:
     type: hl7.fhir.r4.core#4.0.1/BackboneElement
     array: true
     elements:
+      required: [ language ]
       language:
         type: hl7.fhir.r4.core#4.0.1/CodeableConcept
         binding:
@@ -367,10 +374,6 @@ elements:
       preferred:
         type: hl7.fhir.r4.core#4.0.1/boolean
         scalar: true
-    required: [ language ]
-  deceased:
-    choices: [ deceasedBoolean, deceasedDateTime ]
-    scalar: true
   generalPractitioner:
     refers:
     - hl7.fhir.r4.core#4.0.1/Organization
@@ -416,10 +419,7 @@ elements:
       period:
         type: hl7.fhir.r4.core#4.0.1/Period
         scalar: true
-  multipleBirthInteger:
-    type: hl7.fhir.r4.core#4.0.1/integer
-    scalar: true
-    choiceOf: multipleBirth
+
 
 ```
 
