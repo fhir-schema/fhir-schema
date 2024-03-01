@@ -5,37 +5,62 @@ _Element_ is a FHIR Schema component which defines or constrains FHIR data type.
 ## Syntax
 All properties are optional.
 
-`array` (boolean): See [Shape](#shape)\
-`scalar` (boolean): See [Shape](#shape)
+*[Shape](#shape)* properties
+- `array` (boolean)
+- `scalar` (boolean)
+  
+*[Cardinality](#cardinality)* properties
+- `min` (integer)
+- `max` (integer)
 
-`min` (integer): See [Cardinality](#cardinality)\
-`max` (integer): See [Cardinality](#cardinality)
 
-`choiceOf` (string): see [Polymorphism](#polymorphism)\
-`choices` (array of strings): see [Polymorphism](#polymorphism)
+*[Choice type](#choice-type)* properties
 
-`excluded` (array of strings): See [Requires and exclusions](#requires-and-exclusions)\
-`required` (array of strings): See [Requires and exclusions](#requires-and-exclusions)
+- `choiceOf` (string)
+- `choices` (array of strings)
 
-`elementReference` (array of strings): See [Type reference](#type-reference)\
-`type` (string): See [Type reference](#type-reference)
+*[Requires and exclusions](#requires-and-exclusions)* properties
 
-`elements` (object): See [Subelement](#subelement)
+- `excluded` (array of strings)
+- `required` (array of strings)
 
-`constraints` (Constraint): See [Constraint](constraint.md)
+*[Type reference](#type-reference)* properties
 
-`binding` (Binding): valueset binding\
-`fixed` (any): Exact value of the element\
-`pattern` (any): The element shall match the pattern (see Pattern matching)\
-`refers` (array of strings): Allowed reference targets\
-`slicing` (Slicing): FHIR Slicing\
+- `elementReference` (array of strings)
+- `type` (string)
+
+*[Nested elements](#nested-elements)* property
+
+- `elements` (object)
+
+*[Constraints](constraint.md)* property
+
+- `constraints` (Constraint)
+
+*[Slicing](slicing.md)* property
+
+- `slicing` (Slicing)
+
+
+*[Pattern matching (constants definition)](#pattern-matching)* property
+
+- `fixed` (any)
+- `pattern` (any)
+
+*[Terminology binding](#terminology-binding)* property
+
+- `binding` (Binding): valueset binding\
+
+*[Reference target](#reference-target)* property
+
+- `refers` (array of strings)
 
 ## Shape
 There are 2 properties controlling element shape:
 - `array`
 - `scalar`
 
-The `array` and `scalar` properties control element structure. These 2 element are mutually exclusive.
+The `array` and `scalar` properties control element structure. These 2 properties are **mutually exclusive**.
 I.e. the folowing element is invalid.
 ```yaml
 array: true
@@ -48,35 +73,19 @@ If neither is set, everything is accepted.
 Empty arrays are rejected (they are not allowed by FHIR).
 
 ### Example
-Schema
+Consider this part of FHIR R4 Core Patient schema:
 ```yaml
-elements:
-  should_be_array:
-    type: string
-    array: true
-  should_be_scalar:
-    type: string
-    scalar: true
-  may_be_anything:
-    type: string
+{{#include examples/patient-shape.yaml}}
 ```
 
-Valid resources:
+Resource example that conforms to schema mentioned earlier:
 ```yaml
-should_be_array: [abc]
----
-should_be_scalar: abc
----
-may_be_anything: [abc]
----
-may_be_anything: abc
+{{#include examples/patient-resource-shape.yaml}}
 ```
 
-Invalid resources:
+Resource example that didn't conform to schema mentioned earlier
 ```yaml
-should_be_array: abc
----
-should_be_scalar: [abc]
+{{#include examples/invalid-patient-resource-shape.yaml}}
 ```
 
 ## Cardinality

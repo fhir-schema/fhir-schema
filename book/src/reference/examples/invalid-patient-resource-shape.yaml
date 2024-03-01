@@ -1,0 +1,4 @@
+~resourceType: Patient
+gender:
+  - male
+name: John Smith
