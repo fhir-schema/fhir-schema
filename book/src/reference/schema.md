@@ -1,0 +1,20 @@
+# Schema
+
+## Syntax
+- `base`
+- `constraints`
+- `datatype`
+- `derivation`
+- `elements`
+- `excluded`
+- `extensions`
+- `id`
+- `isOpen`
+- `kind`
+- `mustSupport`
+- `package-meta`
+- `primitive-check-fn`
+- `required`
+- `system-type`
+- `type`
+- `url`

@@ -55,6 +55,14 @@ All properties are optional.
 
 - `refers` (array of strings)
 
+Other properties used by validator?
+- `datatype`
+- `isOpen`
+- `modifier`
+- `mustSupport`
+- `summary`
+- `system-type`
+
 ## Shape
 There are 2 properties controlling element shape:
 - `array`
