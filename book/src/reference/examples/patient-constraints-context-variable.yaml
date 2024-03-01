@@ -1,0 +1,9 @@
+resourceType: Patient
+active: true
+gender: male
+contact:
+  - gender: true
+    name:
+      - given:
+          - John
+        family: Smith
