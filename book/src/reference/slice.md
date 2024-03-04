@@ -452,4 +452,4 @@ address:
 
 ## Schema
 
-After an element is matched by the `match` property, you can define additional constraints via the `schema` property. This is simply an [Element](element.md), and the matched data element will be validated against the provided schema as usual.
+After an element is matched by the `match` property, you can define additional constraints via the `schema` property. This property is essentially an [Element](element.md), and the matched data element will be validated against the provided schema as usual. If the validator produces errors during the validation of this element, it will count as an unmatched slice element.
