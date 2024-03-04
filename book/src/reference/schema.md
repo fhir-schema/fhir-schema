@@ -1,5 +1,8 @@
 # Schema
 
+The _schema_ defines elements and specifies constraint rules,
+which are applied on top of base schemas.
+
 ## Syntax
 
 ### Properties applicable only to schema
@@ -58,7 +61,7 @@ base: http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient|6.0.0
 ~name: ExamplePatient
 ```
 
-Valid resource:
+#### Valid Patient resource:
 
 ```yaml
 ~resourceType: Patient
@@ -74,7 +77,7 @@ gender: male
 ~  - Example name
 ```
 
-Invalid resource:
+#### Invalid Patient resource with wrong `gender` type:
 
 ```yaml
 ~resourceType: Patient
@@ -114,14 +117,14 @@ base: http://example.com/Patient/patient|1.0.0
 
 Or you can reference it with `meta.profile` in resource, if you want to validate resource against not default profile:
 
-Valid
+#### Valid Patient resource
 ```yaml
 meta:
   profile: http://example.com/Patient/patient|1.0.0
 new-element: "Example"
 ```
 
-Invalid
+#### Invalid Patient resource with wrong elements type
 ```yaml
 meta:
   profile: http://example.com/Patient/patient|1.0.0
