@@ -68,7 +68,7 @@ inherit all *[elements](element.md#subelement)* and *[constraints](/reference/co
 
 ### Example
 
-Scheme
+Schema
 
 ```yaml
 
