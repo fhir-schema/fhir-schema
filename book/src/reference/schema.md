@@ -52,19 +52,42 @@ inherit all *[elements](element.md#subelement)* and *[constraints](/reference/co
 You can create resource with base profile of US Core Patient:
 
 ```yaml
-base: http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient|6.1.0
+~url: http://example.com/patient
+base: http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient|6.0.0
+~type: Patient
+~name: ExamplePatient
 ```
 
 Valid resource:
 
 ```yaml
-sex: female
+~resourceType: Patient
+~meta:
+~  profile:
+~  - http://example.com/patient
+~identifier:
+~- system: exampleSystem
+~  value: exampleValue
+gender: male
+~name:
+~- given:
+~  - Example name
 ```
 
 Invalid resource:
 
 ```yaml
-sex: true # wrong type
+~resourceType: Patient
+~meta:
+~  profile:
+~  - http://example.com/patient
+~identifier:
+~- system: exampleSystem
+~  value: exampleValue
+gender: true # wrong type
+~name:
+~- given:
+~  - Example name
 ```
 
 ## URL
