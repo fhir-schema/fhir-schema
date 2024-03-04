@@ -574,7 +574,7 @@ Schema with `pattern` element
 ~url:  http://example.com/Patient/patient
 ~base: http://hl7.org/fhir/StructureDefinition/Patient
 ~type: Patient
-~name: Patient-fixed
+~name: Patient-pattern
 elements:
   gender: 
     type: code

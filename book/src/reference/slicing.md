@@ -14,6 +14,10 @@ If the `ordered` property is true, each slice requires an `order` property, whic
 ### Example 
 Schema
 ```yaml
+~url:  http://example.com/Patient/patient
+~base: http://hl7.org/fhir/StructureDefinition/Patient
+~type: Patient
+~name: Patient-slicing
 elements: 
   address: 
     slicing:
@@ -33,19 +37,11 @@ elements:
                   use: work
 ```
 
-Invalid resource
+Valid resources
 ```yaml
-resourceType: Patient
-address:
-  - use: work
-~    text: 534 Erewhon St PeasantVille, Rainbow, Vic  3999
-  - use: home
-~    text: Bos en Lommerplein 280
-```
-
-
-Valid resource
-```yaml
+~meta:
+~  profile: 
+~    - http://example.com/Patient/patient|1.0.0
 resourceType: Patient
 address:
   - use: home
@@ -53,21 +49,10 @@ address:
   - use: work
 ~    text: 534 Erewhon St PeasantVille, Rainbow, Vic  3999
 ```
-
-Invalid resource
 ```yaml
-resourceType: Patient
-address:
-  - use: home
-~    text: Bos en Lommerplein 280
-  - use: work
-~    text: 534 Erewhon St PeasantVille, Rainbow, Vic  3999
-  - use: home
-~    text: Bos en Lommerplein 285
-```
-
-Valid resource
-```yaml
+~meta:
+~  profile: 
+~    - http://example.com/Patient/patient|1.0.0
 resourceType: Patient
 address:
   - use: home
@@ -76,6 +61,33 @@ address:
 ~    text: Bos en Lommerplein 285
   - use: work
 ~    text: 534 Erewhon St PeasantVille, Rainbow, Vic  3999
+```
+
+Invalid resources
+```yaml
+~meta:
+~  profile: 
+~    - http://example.com/Patient/patient|1.0.0
+resourceType: Patient
+address:
+  - use: work
+~    text: 534 Erewhon St PeasantVille, Rainbow, Vic  3999
+  - use: home
+~    text: Bos en Lommerplein 280
+```
+
+```yaml
+~meta:
+~  profile: 
+~    - http://example.com/Patient/patient|1.0.0
+resourceType: Patient
+address:
+  - use: home
+~    text: Bos en Lommerplein 280
+  - use: work
+~    text: 534 Erewhon St PeasantVille, Rainbow, Vic  3999
+  - use: home
+~    text: Bos en Lommerplein 285
 ```
 
 ## Slicing rules 
@@ -88,6 +100,10 @@ The default is `open`.
 ### Example
 Schema with `closed` rules
 ```yaml
+~url:  http://example.com/Patient/patient
+~base: http://hl7.org/fhir/StructureDefinition/Patient
+~type: Patient
+~name: Patient-slicing
 elements:
   address:
     slicing:
@@ -102,6 +118,9 @@ elements:
 
 Invalid resource
 ```yaml
+~meta:
+~  profile: 
+~    - http://example.com/Patient/patient|1.0.0
 resourceType: Patient
 address:
   - use: home
@@ -112,6 +131,9 @@ address:
 
 Valid resource
 ```yaml
+~meta:
+~  profile: 
+~    - http://example.com/Patient/patient|1.0.0
 resourceType: Patient
 address:
   - use: home
@@ -122,6 +144,10 @@ address:
 
 Schema with `openAtEnd` rules
 ```yaml
+~url:  http://example.com/Patient/patient
+~base: http://hl7.org/fhir/StructureDefinition/Patient
+~type: Patient
+~name: Patient-slicing
 elements:
   address:
     rules: openAtEnd
@@ -143,6 +169,9 @@ elements:
 
 Invalid resource
 ```yaml
+~meta:
+~  profile: 
+~    - http://example.com/Patient/patient|1.0.0
 resourceType: Patient
 address:
   - use: temp
@@ -155,6 +184,9 @@ address:
 
 Valid resource
 ```yaml
+~meta:
+~  profile: 
+~    - http://example.com/Patient/patient|1.0.0
 resourceType: Patient
 address:
   - use: home
