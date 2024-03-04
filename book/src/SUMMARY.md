@@ -4,6 +4,7 @@
 - [Chapter 1](./chapter_1.md)
 
 # Tutorial
+- [US Core Patient Profile](./tutorial/us-core-patient.md)
 
 # Reference
 - [Validation Algorithm](./reference/validation.md)
