@@ -1,5 +1,8 @@
 # Slice
 
+A _slice_ of an array is a subarray of the original array to which you can apply constraints.
+
+
 ## Syntax
 **[Slice ID](#slice-id)** property:
 - `<your-slice-id>` (string)
@@ -24,6 +27,13 @@
   - `schema` (Element)
 
 ## Slice matching
+
+### Syntax
+**[Type]** property:
+- `type` (string: pattern|binding|profile|type)
+- `resolve-ref` (boolean)
+- `value` (Object)
+
 A _slice_ of an array is a subarray of the original array. This subarray is selected using match expressions. Let's overview existing match types:
 
 ### Pattern
