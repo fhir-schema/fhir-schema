@@ -1,0 +1,140 @@
+~url: http://hl7.org/fhir/us/core/StructureDefinition/us-core-condition-problems-health-concerns
+~package-meta:
+~  name: hl7.fhir.us.core
+~  version: 5.0.1
+~  path: "/tmp/lw-fhir-schema-repository/hl7.fhir.us.core#5.0.1"
+~id: us-core-condition-problems-health-concerns
+~base: http://hl7.org/fhir/StructureDefinition/Condition
+~kind: resource
+~required:
+~- category
+~- code
+~type: Condition
+~elements:
+~  abatementDateTime:
+~    mustSupport: true
+~    type: dateTime
+~    choiceOf: abatement
+~  onsetPeriod:
+~    mustSupport: true
+~    type: Period
+~    choiceOf: onset
+~  onset:
+~    choices:
+~    - onsetDateTime
+~    - onsetAge
+~    - onsetPeriod
+~    - onsetRange
+~    - onsetString
+~  clinicalStatus:
+~    binding:
+~      valueSet: http://hl7.org/fhir/ValueSet/condition-clinical
+~      strength: required
+~    mustSupport: true
+~  abatementString:
+~    mustSupport: true
+~    type: string
+~    choiceOf: abatement
+~  onsetAge:
+~    mustSupport: true
+~    type: Age
+~    choiceOf: onset
+~  abatementRange:
+~    mustSupport: true
+~    type: Range
+~    choiceOf: abatement
+~  extension:
+~    slicing:
+~      slices:
+~        assertedDate:
+~          schema:
+~            mustSupport: true
+~            type: Extension
+~          max: 1
+~          match:
+~            type: pattern
+~            value:
+~              url: http://hl7.org/fhir/StructureDefinition/condition-assertedDate
+~      discriminator:
+~      - type: value
+~        path: url
+~      rules: open
+~  onsetRange:
+~    mustSupport: true
+~    type: Range
+~    choiceOf: onset
+~  subject:
+~    refers:
+~    - http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient
+~    mustSupport: true
+~    type: Reference
+~  abatementAge:
+~    mustSupport: true
+~    type: Age
+~    choiceOf: abatement
+~  recordedDate:
+~    mustSupport: true
+~  onsetDateTime:
+~    mustSupport: true
+~    type: dateTime
+~    choiceOf: onset
+~  abatement:
+~    choices:
+~    - abatementDateTime
+~    - abatementAge
+~    - abatementPeriod
+~    - abatementRange
+~    - abatementString
+~  abatementPeriod:
+~    mustSupport: true
+~    type: Period
+~    choiceOf: abatement
+~  verificationStatus:
+~    binding:
+~      valueSet: http://hl7.org/fhir/ValueSet/condition-ver-status
+~      strength: required
+~    mustSupport: true
+  category:
+    mustSupport: true
+    slicing:
+~     discriminator:
+~     - type: pattern
+~       path: "$this"
+      rules: open
+      slices:
+        us-core:
+~         schema:
+~           binding:
+~             valueSet: http://hl7.org/fhir/us/core/ValueSet/us-core-problem-or-health-concern
+~             strength: required
+~           mustSupport: true
+          min: 1
+          match:
+            type: binding
+            value:
+              strength: required
+              valueSet: http://hl7.org/fhir/us/core/ValueSet/us-core-problem-or-health-concern
+~        sdoh:
+~          schema:
+~            mustSupport: true
+~            pattern:
+~              coding:
+~              - system: http://hl7.org/fhir/us/core/CodeSystem/us-core-tags
+~                code: sdoh
+~          min: 0
+~          max: 1
+~          match:
+~            type: pattern
+~            value:
+~              coding:
+~              - system: http://hl7.org/fhir/us/core/CodeSystem/us-core-tags
+~                code: sdoh
+~  code:
+~    binding:
+~      valueSet: http://hl7.org/fhir/us/core/ValueSet/us-core-condition-code
+~      strength: extensible
+~    mustSupport: true
+~  onsetString:
+~    mustSupport: true
+~    type: string
+~    choiceOf: onset

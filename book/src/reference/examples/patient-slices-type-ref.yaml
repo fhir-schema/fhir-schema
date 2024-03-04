@@ -1,0 +1,168 @@
+~url: https://profiles.ihe.net/RAD/imr/StructureDefinition/imr-diagnosticreport
+~package-meta:
+~  name: ihe.rad.imr
+~  version: 0.1.0
+~  path: "/tmp/lw-fhir-schema-repository/ihe.rad.imr#0.1.0"
+~id: imr-diagnosticreport
+~base: http://hl7.org/fhir/StructureDefinition/DiagnosticReport
+~kind: resource
+~required:
+~- basedOn
+~- category
+~- subject
+~- effective
+~- effectiveDateTime
+~- issued
+~- performer
+~- resultsInterpreter
+~- result
+~- imagingStudy
+~- presentedForm
+~type: DiagnosticReport
+elements:
+~  effectiveDateTime:
+~    mustSupport: true
+~    type: dateTime
+~  resultsInterpreter:
+~    refers:
+~    - http://hl7.org/fhir/StructureDefinition/Practitioner
+~    - http://hl7.org/fhir/StructureDefinition/PractitionerRole
+~    type: Reference
+~  presentedForm:
+~    constraints:
+~      IMRAttachmentInvariant:
+~        human: Either data or url SHALL be present
+~        severity: error
+~        expression: data.exists() or url.exists()
+~    mustSupport: true
+~    required:
+~    - contentType
+~    - size
+~    - hash
+~    slicing:
+~      discriminator:
+~      - type: pattern
+~        path: contentType
+~      description: Slice based on the presentedForm content type
+~      ordered: false
+~      rules: open
+~      slices:
+~        html:
+~          schema:
+~            elements:
+~              contentType:
+~                pattern: text/html
+~          min: 1
+~          max: 2147483647
+~          match:
+~            type: pattern
+~            value:
+~              contentType: text/html
+~        pdf:
+~          schema:
+~            elements:
+~              contentType:
+~                pattern: applicatoin/pdf
+~          min: 0
+~          max: 2147483647
+~          match:
+~            type: pattern
+~            value:
+~              contentType: applicatoin/pdf
+~    elements:
+~      contentType:
+~        mustSupport: true
+~      size:
+~        mustSupport: true
+~      hash:
+~        mustSupport: true
+~  basedOn:
+~    mustSupport: true
+~    slicing:
+~      discriminator:
+~      - type: type
+~        path: resolve()
+~      description: Slice based on the basedOn reference type
+~      ordered: false
+~      rules: open
+~      slices:
+~        serviceRequest:
+~          schema:
+~            refers:
+~            - https://profiles.ihe.net/RAD/imr/StructureDefinition/imr-servicerequest
+~            type: Reference
+~          min: 1
+~          max: 2147483647
+~          match:
+~            resolve-ref: true
+~            type: type
+~            value: ServiceRequest
+~  imagingStudy:
+~    refers:
+~    - https://profiles.ihe.net/RAD/imr/StructureDefinition/imr-imagingstudy
+~    mustSupport: true
+~    type: Reference
+~  extension:
+~    slicing:
+~      discriminator:
+~      - type: value
+~        path: url
+~      ordered: false
+~      rules: open
+~      slices:
+~        comparisonStudy:
+~          schema:
+~            mustSupport: true
+~            type: Extension
+~          min: 0
+~          max: 2147483647
+~          match:
+~            type: pattern
+~            value:
+~              url: https://profiles.ihe.net/RAD/imr/StructureDefinition/comparisonStudy
+~        indication:
+~          schema:
+~            mustSupport: true
+~            type: Extension
+~          min: 0
+~          max: 2147483647
+~          match:
+~            type: pattern
+~            value:
+~              url: https://profiles.ihe.net/RAD/imr/StructureDefinition/indication
+~  status:
+~    binding:
+~      valueSet: https://profiles.ihe.net/RAD/imr/ValueSet/imr-diagnosticreport-status-vs
+~      strength: required
+~      codesystems:
+~      - http://hl7.org/fhir/diagnostic-report-status
+~  subject:
+~    refers:
+~    - http://hl7.org/fhir/StructureDefinition/Patient
+~    type: Reference
+~  result:
+~    refers:
+~    - https://profiles.ihe.net/RAD/imr/StructureDefinition/imr-observation
+~    mustSupport: true
+~    type: Reference
+  performer:
+    slicing:
+~      discriminator:
+~      - type: type
+~        path: resolve()
+~      description: Slice based on the performer reference type
+~      ordered: false
+~      rules: open
+      slices:
+        organization:
+~          schema:
+~            refers:
+~            - http://hl7.org/fhir/StructureDefinition/Organization
+~            type: Reference
+          min: 1
+          max: 1
+          match:
+            resolve-ref: true
+            type: type
+            value: Organization
+~derivation: constraint

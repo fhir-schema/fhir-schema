@@ -1,0 +1,38 @@
+~url: http://hl7.org/fhir/us/davinci-alerts/StructureDefinition/transfer-notification-messageheader
+~package-meta:
+~  name: hl7.fhir.us.davinci-alerts
+~  version: 1.0.0
+~  path: test/fixtures/hl7.fhir.us.davinci-alerts#1.0.0
+~id: transfer-notification-messageheader
+~base: http://hl7.org/fhir/us/davinci-alerts/StructureDefinition/notifications-messageheader
+~required:
+~- eventCoding
+~- focus
+~type: MessageHeader
+elements:
+~  eventCoding:
+~    binding:
+~      valueSet: http://hl7.org/fhir/us/davinci-alerts/ValueSet/notification-transfer-event
+~      strength: extensible
+~    mustSupport: true
+~    type: Coding
+  focus:
+~    mustSupport: true
+    slicing:
+~      discriminator:
+~      - type: profile
+~        path: "$this.resolve()"
+      rules: open
+      slices:
+        discharge-notification:
+~          schema:
+~            refers:
+~            - http://hl7.org/fhir/us/davinci-alerts/StructureDefinition/adt-notification-encounter
+~            mustSupport: true
+~            type: Reference
+          min: 1
+          match:
+            type: profile
+            resolve-ref: true
+            value: http://hl7.org/fhir/us/davinci-alerts/StructureDefinition/adt-notification-encounter
+~    array: true
