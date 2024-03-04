@@ -2,15 +2,17 @@
 
 ## Syntax
 
-### Required properties
+### Properties applicable only to schema
 
-*[URL](#url)* property
-
-- `url` : string
+*All properties are required*
 
 *[Base type](#base-type)* property
 
 - `base` : string
+
+*[URL](#url)* property
+
+- `url` : string
 
 *[Resource type](#base-type)* property
 
@@ -20,7 +22,8 @@
 
 - `name` : string
 
-### Optional properties
+
+### Properties shared with *[elements](element.md)*
 
 *[Requires and exclusions](element.md#requires-and-exclusions)* properties
 
@@ -39,28 +42,6 @@
 
 - `extensions`
 
-## URL
-
-The `url` is used to reference this profile in `base` property in other profiles.
-
-### Example
-
-After creating profile with following url:
-
-```yaml
-
-url: http://example.com/Patient/patient
-
-```
-
-You can reference it, for example, in `base` property from another profile:
-
-```yaml
-
-base: http://example.com/Patient/patient|1.0.0
-
-```
-
 ## Base
 
 The `base` property defines the base profile from which schema will
@@ -68,12 +49,60 @@ inherit all *[elements](element.md#subelement)* and *[constraints](/reference/co
 
 ### Example
 
-Schema
+You can create resource with base profile of US Core Patient:
 
 ```yaml
-
 base: http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient|6.1.0
+```
 
+Valid resource:
+
+```yaml
+sex: female
+```
+
+Invalid resource:
+
+```yaml
+sex: true # wrong type
+```
+
+## URL
+
+The `url` is used to reference the profile in `base` property in other profiles.
+
+### Example
+
+After creating profile with following url:
+
+```yaml
+base: http://hl7.org/fhir/StructureDefinition/Patient
+url: http://example.com/Patient/patient
+elements:
+  new-element:
+    type: string
+```
+
+You can reference it, for example, in `base` property from another profile:
+
+```yaml
+base: http://example.com/Patient/patient|1.0.0
+```
+
+Or you can reference it with `meta.profile` in resource, if you want to validate resource against not default profile:
+
+Valid
+```yaml
+meta:
+  profile: http://example.com/Patient/patient|1.0.0
+new-element: "Example"
+```
+
+Invalid
+```yaml
+meta:
+  profile: http://example.com/Patient/patient|1.0.0
+new-element: true
 ```
 
 ## Resource type
@@ -81,14 +110,10 @@ base: http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient|6.1.0
 The `type` property defines which resource type being constrained.
 The type **must** match with `type` property of base profile.
 
-### Example
-
-Schema
-
+Example:
 ```yaml
-
+base: http://hl7.org/fhir/StructureDefinition/Patient
 type: Patient
-
 ```
 
 ## Name
