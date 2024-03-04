@@ -1,0 +1,130 @@
+~url: http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient
+constraints:
+  us-core-6:
+    human: Either Patient.name.given and/or Patient.name.family SHALL be present or
+      a Data Absent Reason Extension SHALL be present.
+    severity: error
+    expression: "(name.family.exists() or name.given.exists()) xor extension.where(url='http://hl7.org/fhir/StructureDefinition/data-absent-reason').exists()"
+~package-meta:
+~  name: hl7.fhir.us.core
+~  version: 5.0.1
+~  path: "/tmp/lw-fhir-schema-repository/hl7.fhir.us.core#5.0.1"
+~id: us-core-patient
+~base: http://hl7.org/fhir/StructureDefinition/Patient
+~kind: resource
+~required:
+~- identifier
+~- name
+~- gender
+~type: Patient
+~elements:
+~  extension:
+~    slicing:
+~      slices:
+~        race:
+~          schema:
+~            type: Extension
+~          min: 0
+~          max: 1
+~          match:
+~            type: pattern
+~            value:
+~              url: http://hl7.org/fhir/us/core/StructureDefinition/us-core-race
+~        ethnicity:
+~          schema:
+~            type: Extension
+~          min: 0
+~          max: 1
+~          match:
+~            type: pattern
+~            value:
+~              url: http://hl7.org/fhir/us/core/StructureDefinition/us-core-ethnicity
+~        birthsex:
+~          schema:
+~            type: Extension
+~          min: 0
+~          max: 1
+~          match:
+~            type: pattern
+~            value:
+~              url: http://hl7.org/fhir/us/core/StructureDefinition/us-core-birthsex
+~        genderIdentity:
+~          schema:
+~            type: Extension
+~          min: 0
+~          max: 1
+~          match:
+~            type: pattern
+~            value:
+~              url: http://hl7.org/fhir/us/core/StructureDefinition/us-core-genderIdentity
+~      discriminator:
+~      - type: value
+~        path: url
+~      rules: open
+~  identifier:
+~    mustSupport: true
+~    required:
+~    - system
+~    - value
+~    elements:
+~      system:
+~        mustSupport: true
+~      value:
+~        mustSupport: true
+~  name:
+~    mustSupport: true
+~    elements:
+~      family:
+~        mustSupport: true
+~      given:
+~        mustSupport: true
+~  telecom:
+~    required:
+~    - system
+~    - value
+~    elements:
+~      system:
+~        binding:
+~          valueSet: http://hl7.org/fhir/ValueSet/contact-point-system
+~          strength: required
+~        mustSupport: true
+~      value:
+~        mustSupport: true
+~      use:
+~        binding:
+~          valueSet: http://hl7.org/fhir/ValueSet/contact-point-use
+~          strength: required
+~        mustSupport: true
+~  gender:
+~    binding:
+~      valueSet: http://hl7.org/fhir/ValueSet/administrative-gender
+~      strength: required
+~      codesystems:
+~    mustSupport: true
+~    type: code
+~  birthDate:
+~    mustSupport: true
+~  address:
+~    mustSupport: true
+~    elements:
+~      line:
+~        mustSupport: true
+~      city:
+~        mustSupport: true
+~      state:
+~        binding:
+~          valueSet: http://hl7.org/fhir/us/core/ValueSet/us-core-usps-state
+~          strength: extensible
+~        mustSupport: true
+~      postalCode:
+~        mustSupport: true
+~      period:
+~        mustSupport: true
+~  communication:
+~    elements:
+~      language:
+~        binding:
+~          valueSet: http://hl7.org/fhir/us/core/ValueSet/simple-language
+~          strength: extensible
+~        mustSupport: true
+~derivation: constraint

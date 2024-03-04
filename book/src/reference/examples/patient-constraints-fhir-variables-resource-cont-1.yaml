@@ -1,0 +1,10 @@
+resourceType: Patient
+meta:
+  profile:
+  - contained-invariant-profile
+contained:
+- resourceType: Practitioner
+  name:
+  - family: a
+generalPractitioner:
+- reference: Practitioner/1

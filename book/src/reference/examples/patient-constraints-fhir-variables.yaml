@@ -1,0 +1,29 @@
+~url: "contained-invariant-profile"
+~base: "Patient"
+elements:
+  contained:
+    constraints:
+      cont-1:
+        human: "Check context variables are set correctly"
+        severity: "error"
+        expression: "%context.type().name.trace('cont-1-context:') = 'Practitioner'
+                     and %resource.type().name.trace('cont-1-resource') = 'Patient'
+                     and %rootResource.type().name.trace('cont-1-root') = 'Patient'"
+    type: "Practitioner"
+    elements:
+      name:
+        constraints:
+          cont-2:
+            human: "Check context variables are set correctly"
+            severity: "error"
+            expression: "%context.type().name.trace('cont-2-context:') = 'HumanName'
+                         and %resource.type().name.trace('cont-2-resource') = 'Practitioner'
+                         and %rootResource.type().name.trace('cont-2-rootResource') = 'Patient'"
+  generalPractitioner:
+    constraints:
+      cont-3:
+        human: "Check context variables are set correctly"
+        severity: "error"
+        expression: "%context.type().name.trace('cont-3-context') = 'Reference'
+                     and %resource.type().name.trace('cont-3-resource') = 'Patient'
+                     and %rootResource.type().name.trace('cont-3-rootresource') = 'Patient'"
