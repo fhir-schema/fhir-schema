@@ -6,6 +6,7 @@
 # Tutorial
 
 # Reference
+- [Validation Algorithm](./reference/validation.md)
 - [Schema](./reference/schema.md)
 - [Element](./reference/element.md)
 - [Constraint](./reference/constraint.md)
