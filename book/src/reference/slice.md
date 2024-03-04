@@ -43,7 +43,7 @@ slicing:
 ```
 
 
-#### Valid data element
+#### Matched data element
 The following data element will be matched into the slice defined earlier:
 
 ```yaml
@@ -52,7 +52,7 @@ system: http://hl7.org/fhir/sid/us-npi
 value: 1346336807
 ```
 
-#### Invalid data element
+#### Unmatched data element
 The following data element won't be matched into the slice defined earlier:
 
 ```yaml
@@ -78,7 +78,7 @@ Consider folowing  US Core 5.0.1 Condition Problems and Health Concerns schema:
 ```
 > Human interpretation of the slice: _There should be at least one `CodeableConcept` in `category` that matches the provided terminology binding._
 
-#### Valid data element
+#### Matched data element
 
 The following data element will be matched into the slice defined earlier:
 
@@ -89,7 +89,7 @@ coding:
 
 ```
 
-#### Invalid data element
+#### Unmatched data element
 
 The following data element won't be matched into the slice defined earlier (_terminology biding violation_):
 ```yaml
@@ -117,7 +117,7 @@ Consider this two custom schemas for Patient and Bundle resources:
 > Human interpretation of the slice: there should be only one resource entry that fully conforms to `custom-pat` profile
 
 
-#### Valid data element
+#### Matched data element
 
 The following data element (`entry.0.resource`) will be matched into the slice defined earlier:
 
@@ -137,7 +137,7 @@ entry:
 ```
 
 
-#### Invalid data element
+#### Unmatched data element
 
 The following data element (`entry.0.resource`) won't be matched (due to missed `gender` property) into the slice defined earlier:
 
@@ -175,7 +175,7 @@ Consider this Davinici 0.1.0 Alerts schema:
 ```
 > Human interpretation of the slice: _there should be only one MessageHeader resource among the bundle entries_
 
-#### Valid data element
+#### Matched data element
 
 The following data element (`entry.0.resource`) will be matched into the slice defined earlier:
 
@@ -194,7 +194,7 @@ entry:
       endpoint: google.com
 ```
 
-#### Invalid data element
+#### Unmatched data element
 
 The following data element (`entry.0.resource`) won't be matched (due to wrong resource type) into the slice defined earlier:
 
@@ -220,7 +220,7 @@ Consider this IHE Interactive Multimedia Report (IMR) DiagnosticReport schema
 ```
 
 
-#### Valid data element
+#### Matched data element
 
 The following data element (`performer.0`) will be matched into the slice defined earlier:
 
@@ -234,7 +234,7 @@ performer:
 
 ```
 
-#### Invalid data element
+#### Unmatched data element
 
 The following data element (`performer.0`) won't be matched (due to wrong reference type) into the slice defined earlier:
 
@@ -259,7 +259,7 @@ Consider following US Core 5.0.1 race extension schema
 {{#include examples/patient-slices-cardinality.yaml}}
 ```
 
-#### Valid data elements
+#### Valid case
 The following data elements will be matched into the slices defined earlier:
 
 ```yaml
@@ -274,7 +274,7 @@ extension:
 url: http://hl7.org/fhir/us/core/StructureDefinition/us-core-race
 ```
 
-#### Invalid data elements
+#### Invalid case
 Due to the absence of text, the text slice won't be matched, resulting in a validation error, since the text slice is required.
 
 ```yaml
@@ -453,3 +453,59 @@ address:
 ## Schema
 
 After an element is matched by the `match` property, you can define additional constraints via the `schema` property. This property is essentially an [Element](element.md), and the matched data element will be validated against the provided schema as usual. If the validator produces errors during the validation of this element, it will count as an unmatched slice element.
+
+Consider following custom schema:
+
+```yaml
+base: Patient
+url: custom-pat
+elements:
+  name:
+    slicing:
+      slices:
+        off-name:
+          schema:
+            constraints:
+              off-nam-constr-1:
+                expression: given.exists() or family.exists()
+                severity: error
+          match:
+            type: pattern
+            min: 1
+            value:
+              use: official
+
+```
+> Human description of the slice: there should be at least one name with `use: official`, this name must contain `given` or `family`.
+
+### Valid case
+
+The following name will be matched into slice defined earlier.
+
+```yaml
+resourceType: Patient
+name:
+  - use: official
+    given:
+      - John
+```
+
+### Invalid cases
+
+No `official` name.
+
+```yaml
+resourceType: Patient
+name:
+  - use: nickname
+    given:
+      - test
+```
+
+No `given` or `family`.
+```yaml
+resourceType: Patient
+name:
+  - use: official
+    text: test
+```
