@@ -12,7 +12,7 @@ Property `ordered` forces special order for slices.
 If the `ordered` property is true, each slice requires an `order` property, which is the number in the order of the slices. Items in the list must be ordered to match slices in the specified order.
 
 ### Example 
-Schema
+#### Schema
 ```yaml
 ~url:  http://example.com/Patient/patient
 ~base: http://hl7.org/fhir/StructureDefinition/Patient
@@ -37,7 +37,7 @@ elements:
                   use: work
 ```
 
-Valid resources
+#### Valid resources
 ```yaml
 ~meta:
 ~  profile: 
@@ -63,7 +63,7 @@ address:
 ~    text: 534 Erewhon St PeasantVille, Rainbow, Vic  3999
 ```
 
-Invalid resources
+#### Invalid resources
 ```yaml
 ~meta:
 ~  profile: 
@@ -98,7 +98,7 @@ The `rules` property specifies validation rules:
 
 The default is `open`.
 ### Example
-Schema with `closed` rules
+#### Schema with `closed` rules
 ```yaml
 ~url:  http://example.com/Patient/patient
 ~base: http://hl7.org/fhir/StructureDefinition/Patient
@@ -116,7 +116,7 @@ elements:
               use: home
 ```
 
-Invalid resource
+#### Invalid resource
 ```yaml
 ~meta:
 ~  profile: 
@@ -129,7 +129,7 @@ address:
 ~    text: 534 Erewhon St PeasantVille, Rainbow, Vic  3999
 ```
 
-Valid resource
+#### Valid resource
 ```yaml
 ~meta:
 ~  profile: 
@@ -142,7 +142,7 @@ address:
 ~    text: Bos en Lommerplein 285
 ```
 
-Schema with `openAtEnd` rules
+#### Schema with `openAtEnd` rules
 ```yaml
 ~url:  http://example.com/Patient/patient
 ~base: http://hl7.org/fhir/StructureDefinition/Patient
@@ -167,7 +167,7 @@ elements:
             use: work
 ```
 
-Invalid resource
+#### Invalid resource
 ```yaml
 ~meta:
 ~  profile: 
@@ -182,7 +182,7 @@ address:
 ~    text: 534 Erewhon St PeasantVille, Rainbow, Vic  3999
 ```
 
-Valid resource
+#### Valid resource
 ```yaml
 ~meta:
 ~  profile: 
