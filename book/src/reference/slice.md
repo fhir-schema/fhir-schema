@@ -4,38 +4,38 @@ A _slice_ of an array is a subarray of the original array to which you can apply
 
 
 ## Syntax
-**[Slice ID](#slice-id)** property:
+*[Slice ID](#slice-id)* property:
 - `<your-slice-id>` (string)
 
-  **[Match](#slice-matching)** property:
-  - `match` (Match)
+  *[Match](#slice-matching)* property:
+  -`match` (Match)
   
-  **[Cardinality](#cardinality)** properties:
-  - `min` (integer)
-  - `max` (integer)
+  *[Cardinality](#cardinality)* properties:
+  -`min` (integer)
+  -`max` (integer)
   
-  **[Order](#order)** property:
-  - `order` (integer)
+  *[Order](#order)* property:
+  -`order` (integer)
   
-  **[Reslice](#reslice)** property:
-  - `reslice` (string)
+  *[Reslice](#reslice)* property:
+  -`reslice` (string)
   
-  **[Constrain existing slice](#constraining-existing-slice)** property:
-  - `sliceIsConstraining` (boolean)
+  *[Constrain existing slice](#constraining-existing-slice)* property:
+  -`sliceIsConstraining` (boolean)
   
-  **[Schema](element.md)** property
+  *[Schema](element.md)* property
   - `schema` (Element)
 
 ## Slice matching
 
 ### Syntax
-**Type** property:
+*Type* property:
 - `type` (string: pattern|binding|profile|type)
 
-**Resolve ref (Obtain reference target and perform checks on it?)** property:
+*Resolve ref (Obtain reference target and perform checks on it?)* property:
 - `resolve-ref` (boolean)
 
-**Pattern / Binding / Profile / Type specification** property:
+*Pattern / Binding / Profile / Type specification* property:
 - `value` (Object)
 
 A _slice_ of an array is a subarray of the original array. This subarray is selected using match expressions. Let's overview existing match types:

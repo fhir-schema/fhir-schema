@@ -4,16 +4,16 @@ _Constraint_ is a component of the FHIR Schema that specifies FHIRPath constrain
 
 ## Syntax
 
-**[Constraint ID](#constraint-id)** property:
+*[Constraint ID](#constraint-id)* property:
 - `<your-constraint-id>` (string)
 
-  **[Expression](#expression)** property:
+  *[Expression](#expression)* property:
   - `expression` (string)
   
-  **[Human](#human)** property:
+  *[Human](#human)* property:
   - `human` (string)
   
-  **[Severity](#severity)** property:
+  *[Severity](#severity)* property:
   - `severity` (string: error | warning | guideline)
   
 ## Constraint ID
