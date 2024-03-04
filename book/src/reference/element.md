@@ -497,6 +497,142 @@ generalPractitioner:
   - reference: Patient/patient-1
 ```
 
+## Pattern matching
+There are 2 properties to define elements that match constant values:
+- `fixed`: a value that must match the value of element;
+- `pattern`: a value that specifies the entries or items that an element must contain. 
+
+### Example
+Schema with `fixed` element
+
+```yaml
+~url:  http://example.com/Patient/patient
+~base: http://hl7.org/fhir/StructureDefinition/Patient
+~type: Patient
+~name: Patient-fixed
+elements:
+  gender:
+    type: code
+    fixed: male
+  name:
+    type: HumanName
+    fixed:
+      - family: Smith
+```
+
+Valid resources
+```yaml
+~meta:
+~  profile: 
+~     - http://example.com/Patient/patient|1.0.0
+resourceType: Patient
+gender: male
+name:
+  - family: Smith
+```
+
+Invalid resources
+```yaml
+~meta:
+~  profile: 
+~    - http://example.com/Patient/patient|1.0.0
+resourceType: Patient
+gender: male
+name:
+  - family: Smith
+    given: John
+---
+~meta:
+~  profile: 
+~    - http://example.com/Patient/patient|1.0.0
+resourceType: Patient
+gender: female
+name:
+  - family: Smith
+---
+~meta:
+~  profile: 
+~    - http://example.com/Patient/patient|1.0.0
+resourceType: Patient
+gender: male
+name:
+  - family: Smith
+    given: John
+---
+~meta:
+~  profile: 
+~    - http://example.com/Patient/patient|1.0.0
+resourceType: Patient
+gender: male
+name:
+  - family: Smith
+  - family: Gray
+```
+
+Schema with `pattern` element
+```yaml
+~url:  http://example.com/Patient/patient
+~base: http://hl7.org/fhir/StructureDefinition/Patient
+~type: Patient
+~name: Patient-fixed
+elements:
+  gender: 
+    type: code
+    pattern: male
+  name:
+    type: HumanName
+    pattern:
+      - family: Smith
+```
+
+Valid resources
+```yaml
+~meta:
+~  profile: 
+~    - http://example.com/Patient/patient|1.0.0
+resourceType: Patient
+gender: male
+name:
+  - family: Smith
+---
+~meta:
+~  profile: 
+~    - http://example.com/Patient/patient|1.0.0
+resourceType: Patient
+gender: male
+name:
+  - family: Smith
+    given: John
+---
+~meta:
+~  profile: 
+~    - http://example.com/Patient/patient|1.0.0
+resourceType: Patient
+gender: male
+name:
+  - family: Smith
+  - family: Gray
+```
+
+Invalid resources
+```yaml
+~meta:
+~  profile: 
+~    - http://example.com/Patient/patient|1.0.0
+resourceType: Patient
+gender: female
+name:
+  - family: Smith
+---
+~meta:
+~  profile: 
+~    - http://example.com/Patient/patient|1.0.0
+resourceType: Patient
+gender: male
+name:
+  - family: Gray
+```
+
 ## Informational
 These properties do not affect validation, but they provide additional information about element.
 
@@ -508,3 +644,4 @@ The _mustSupport_ element must be supported by an implementation.
 
 The `summary` property mirrors the `ElementDefinition.isSummary` FHIR property.
 The _summary_ element should be included in FHIR Search in summary mode.
+
