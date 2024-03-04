@@ -75,9 +75,10 @@ array: true
 scalar: true
 ```
 
-If `array` is set, only JSON arrays are excepted.
-If `scalar` is set, JSON arrays are rejected.
-If neither is set, everything is accepted.
+- If `array` is set, only JSON arrays are accepted.
+- If `scalar` is set, JSON arrays are rejected.
+- If neither is set, everything is accepted.
+
 Empty arrays are rejected (they are not allowed by FHIR).
 
 ### Example
@@ -139,7 +140,7 @@ array:
   - d
 ```
 
-## Polymorphism
+## Choice type
 There are 2 properties controlling polymorphism:
 - `choiceOf`
 - `choices`
@@ -361,7 +362,7 @@ a:
       c: abc
 ```
 
-## Subelement
+## Nested elements
 The `elements` property define subelement constraints.
 Syntactically it is an object, with string keys and Element values.
 Semantically it defines behavior of the corresponding fields in data.
