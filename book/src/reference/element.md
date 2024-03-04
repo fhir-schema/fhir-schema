@@ -286,6 +286,7 @@ Data is accepted if both conditions are met:
 ### Example
 Schema
 ```yaml
+{{#include examples/patient-type.yaml}}
 elements:
   a:
     type: string
@@ -299,28 +300,30 @@ elements:
 
 Valid resources
 ```yaml
-a:
-  - abc
+~resourceType: Patient
+gender: other
 ---
-b:
-  - abc
+~resourceType: Patient
+name:
+  - text: James
 ```
 
 Invalid resources
 ```yaml
-a:
-  - abc
-  - def
+~resourceType: Patient
+gender: 2
 ---
-b:
-  - abc
-  - def
+~resourceType: Patient
+name:
+  - James
 ---
-a:
-  - 1
+~resourceType: Patient
+gender:
+  text: James
 ---
-b:
-  - 1
+~resourceType: Patient
+name:
+  - 2
 ```
 
 ### Element reference syntax
