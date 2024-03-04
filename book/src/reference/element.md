@@ -78,7 +78,8 @@ Resource example that conforms to schema mentioned earlier:
 ```yaml
 ~resourceType: Patient
 gender: male
----
+```
+```yaml
 ~resourceType: Patient
 name:
   - text: John Smith
@@ -89,7 +90,8 @@ Resource example that didn't conform to schema mentioned earlier
 ~resourceType: Patient
 gender:
   - male
----
+```
+```yaml
 ~resourceType: Patient
 name:
   text: John Smith
@@ -127,7 +129,8 @@ name:
 ~meta:
 ~  profile:
 ~    - http://example.org/StructureDefinition/patient-minmax
----
+```
+```yaml
 ~resourceType: Patient
 name:
   - text: James
@@ -147,7 +150,8 @@ name:
 ~meta:
 ~  profile:
 ~    - http://example.org/StructureDefinition/patient-minmax
----
+```
+```yaml
 ~resourceType: Patient
 name:
   - text: James
@@ -167,9 +171,11 @@ There are 2 properties controlling polymorphism:
 In FHIR polymorhpic types are used to allow values of different types, for instance
 ```yaml
 valueString: abc
----
+```
+```yaml
 valueCode: some-code
----
+```
+```yaml
 valueCoding:
   system: some-system
   value: some-value
@@ -192,7 +198,8 @@ Schema
 Valid resources:
 ```yaml
 multipleBirthBoolean: true
----
+```
+```yaml
 multipleBirthInteger: 3
 ```
 
@@ -200,11 +207,14 @@ Invalid resources:
 ```yaml
 multipleBirthBoolean: true
 multipleBirthInteger: 3
----
+```
+```yaml
 multipleBirthString: "3"
----
+```
+```yaml
 multipleBirth: true
----
+```
+```yaml
 multipleBirth: 3
 ```
 
@@ -236,7 +246,8 @@ birthDate: "2000-01-01"
 ~meta:
 ~  profile:
 ~    - http://example.org/StructureDefinition/patient-minmax
----
+```
+```yaml
 ~resourceType: Patient
 birthDate: "2000-01-01"
 active: true
@@ -252,13 +263,15 @@ active: true
 ~meta:
 ~  profile:
 ~    - http://example.org/StructureDefinition/patient-minmax
----
+```
+```yaml
 ~resourceType: Patient
 gender: other
 ~meta:
 ~  profile:
 ~    - http://example.org/StructureDefinition/patient-minmax
----
+```
+```yaml
 ~resourceType: Patient
 birthDate: "2000-01-01"
 gender: other
@@ -302,7 +315,8 @@ Valid resources
 ```yaml
 ~resourceType: Patient
 gender: other
----
+```
+```yaml
 ~resourceType: Patient
 name:
   - text: James
@@ -312,15 +326,18 @@ Invalid resources
 ```yaml
 ~resourceType: Patient
 gender: 2
----
+```
+```yaml
 ~resourceType: Patient
 name:
   - James
----
+```
+```yaml
 ~resourceType: Patient
 gender:
   text: James
----
+```
+```yaml
 ~resourceType: Patient
 name:
   - 2
@@ -369,7 +386,8 @@ Valid resources:
 item:
   - type: display
 ~    linkId: q-1
----
+```
+```yaml
 ~resourceType: Questionnaire
 ~status: draft
 item:
@@ -378,7 +396,8 @@ item:
 ~        linkId: q-2
     type: group
 ~    linkId: q-1
----
+```
+```yaml
 ~resourceType: Questionnaire
 ~status: draft
 item:
@@ -404,7 +423,8 @@ item:
       - wrongType
 ~    type: group
     linkId: q-1
----
+```
+```yaml
 ~resourceType: Questionnaire
 ~status: draft
 item:
@@ -498,12 +518,14 @@ Valid resources:
 ~resourceType: Patient
 generalPractitioner:
   - reference: Organization/organization-1
----
+```
+```yaml
 ~resourceType: Patient
 generalPractitioner:
   - reference: Practitioner/practitioner-1
   - reference: Organization/organization-1
----
+```
+```yaml
 ~resourceType: Patient
 generalPractitioner:
   - reference: Practitioner/practitioner-1
@@ -514,7 +536,8 @@ Invalid resources:
 ~resourceType: Patient
 generalPractitioner:
   - reference: Patient/patient-1
----
+```
+```yaml
 ~resourceType: Patient
 generalPractitioner:
   - reference: Organization/organization-1
@@ -565,7 +588,8 @@ gender: male
 name:
   - family: Smith
     given: John
----
+```
+```yaml
 ~meta:
 ~  profile: 
 ~    - http://example.com/Patient/patient|1.0.0
@@ -573,7 +597,8 @@ resourceType: Patient
 gender: female
 name:
   - family: Smith
----
+```
+```yaml
 ~meta:
 ~  profile: 
 ~    - http://example.com/Patient/patient|1.0.0
@@ -582,7 +607,8 @@ gender: male
 name:
   - family: Smith
     given: John
----
+```
+```yaml
 ~meta:
 ~  profile: 
 ~    - http://example.com/Patient/patient|1.0.0
@@ -618,7 +644,8 @@ resourceType: Patient
 gender: male
 name:
   - family: Smith
----
+```
+```yaml
 ~meta:
 ~  profile: 
 ~    - http://example.com/Patient/patient|1.0.0
@@ -627,7 +654,8 @@ gender: male
 name:
   - family: Smith
     given: John
----
+```
+```yaml
 ~meta:
 ~  profile: 
 ~    - http://example.com/Patient/patient|1.0.0
@@ -647,7 +675,8 @@ resourceType: Patient
 gender: female
 name:
   - family: Smith
----
+```
+```yaml
 ~meta:
 ~  profile: 
 ~    - http://example.com/Patient/patient|1.0.0
