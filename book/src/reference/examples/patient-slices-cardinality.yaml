@@ -1,0 +1,112 @@
+~url: http://hl7.org/fhir/us/core/StructureDefinition/us-core-race
+~package-meta:
+~  name: hl7.fhir.us.core
+~  version: 5.0.1
+~  path: "/tmp/lw-fhir-schema-repository/hl7.fhir.us.core#5.0.1"
+~excluded:
+~- value
+~id: us-core-race
+~base: http://hl7.org/fhir/StructureDefinition/Extension
+~kind: complex-type
+~required:
+~- url
+~type: Extension
+elements:
+  extension:
+    slicing:
+      slices:
+        ombCategory:
+~          schema:
+~            mustSupport: true
+~            required:
+~            - url
+~            - value
+~            type: Extension
+~            elements:
+~              url:
+~                scalar: true
+~                fixed: ombCategory
+~                type: uri
+~              valueCoding:
+~                binding:
+~                  valueSet: http://hl7.org/fhir/us/core/ValueSet/omb-race-category
+~                  strength: required
+~                scalar: true
+~                required-element: true
+~                type: Coding
+~                choiceOf: value
+~              value:
+~                choices:
+~                - valueCoding
+~                scalar: true
+          min: 0
+          max: 5
+          match:
+            type: pattern
+            value:
+              url: ombCategory
+~        detailed:
+~          schema:
+~            required:
+~            - url
+~            - value
+~            type: Extension
+~            elements:
+~              url:
+~                scalar: true
+~                fixed: detailed
+~                type: uri
+~              valueCoding:
+~                binding:
+~                  valueSet: http://hl7.org/fhir/us/core/ValueSet/detailed-race
+~                  strength: required
+~                scalar: true
+~                required-element: true
+~                type: Coding
+~                choiceOf: value
+~              value:
+~                choices:
+~                - valueCoding
+~                scalar: true
+~          min: 0
+~          max: 2147483647
+~          match:
+~            type: pattern
+~            value:
+~              url: detailed
+        text:
+~          schema:
+~            scalar: true
+~            mustSupport: true
+~            required:
+~            - url
+~            - value
+~            type: Extension
+~            elements:
+~              url:
+~                scalar: true
+~                fixed: text
+~                type: uri
+~              valueString:
+~                scalar: true
+~                required-element: true
+~                type: string
+~                choiceOf: value
+~              value:
+~                choices:
+~                - valueString
+~                scalar: true
+          min: 1
+          max: 1
+          match:
+            type: pattern
+            value:
+              url: text
+~      discriminator:
+~      - type: value
+~        path: url
+~      rules: open
+~  url:
+~    scalar: true
+~    fixed: http://hl7.org/fhir/us/core/StructureDefinition/us-core-race
+~derivation: constraint

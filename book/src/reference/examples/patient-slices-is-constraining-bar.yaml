@@ -1,0 +1,11 @@
+base: foo
+type: Patient
+elements:
+  address:
+    type: Address
+    array: true
+    slicing:
+      slices:
+        homeaddress:
+          sliceIsConstraining: true
+          max: 0

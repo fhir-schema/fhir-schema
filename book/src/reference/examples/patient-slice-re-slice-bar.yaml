@@ -1,0 +1,15 @@
+base: foo
+type: Patient
+elements:
+  address:
+    type: Address
+    array: true
+    slicing:
+      slices:
+        homeaddress/a:
+          reslice: homeaddress
+          max: 2
+          match:
+            type: pattern
+            value:
+              text: foo

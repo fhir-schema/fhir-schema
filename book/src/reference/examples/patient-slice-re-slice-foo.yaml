@@ -1,0 +1,15 @@
+base: http://hl7.org/fhir/StructureDefinition/Patient
+type: Patient
+elements:
+  address:
+    type: Address
+    array: true
+    slicing:
+      rules: closed
+      slices:
+        homeaddress:
+          min: 1
+          match:
+            type: pattern
+            value:
+              use: home
