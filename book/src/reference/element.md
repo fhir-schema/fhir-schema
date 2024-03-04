@@ -228,32 +228,52 @@ The `excluded` property lists all subelements which shall be absent.
 ### Example
 Schema
 ```yaml
-required: [a]
-excluded: [b]
-elements:
-  a:
-    type: string
-  b:
-    type: string 
-  c: type: string
+~url: http://example.org/StructureDefinition/patient-minmax
+~base: http://hl7.org/fhir/StructureDefinition/Patient
+~type: Patient
+~derivation: constraint
+required:
+  - birthDate
+excluded:
+  - gender
 ```
 
 Valid resources
 ```yaml
-a: abc
+~resourceType: Patient
+birthDate: "2000-01-01"
+~meta:
+~  profile:
+~    - http://example.org/StructureDefinition/patient-minmax
 ---
-a: abc
-c: abc
+~resourceType: Patient
+birthDate: "2000-01-01"
+active: true
+~meta:
+~  profile:
+~    - http://example.org/StructureDefinition/patient-minmax
 ```
 
 Invalid resources
 ```yaml
-c: abc
+~resourceType: Patient
+active: true
+~meta:
+~  profile:
+~    - http://example.org/StructureDefinition/patient-minmax
 ---
-b: abc
+~resourceType: Patient
+gender: other
+~meta:
+~  profile:
+~    - http://example.org/StructureDefinition/patient-minmax
 ---
-a: abc
-b: abc
+~resourceType: Patient
+birthDate: "2000-01-01"
+gender: other
+~meta:
+~  profile:
+~    - http://example.org/StructureDefinition/patient-minmax
 ```
 
 ## Type reference
@@ -345,47 +365,68 @@ Element reference is useful for defining recursive structures (e.g. `Questionnai
 ### Example
 Schema
 ```yaml
-url: http://example.org/abc
-elements:
-  a:
-    elements:
-      b:
-        type: string
-      a:
-        elementReference: [http://example.org/abc, elements, a]
+{{#include examples/questionnaire-typereference.yaml}}
 ```
 
 Valid resources:
 ```yaml
-a:
-  b: abc
+~resourceType: Questionnaire
+~status: draft
+item:
+  - type: display
+~    linkId: q-1
 ---
-a:
-  a:
-    b: abc
-  b: abc
+~resourceType: Questionnaire
+~status: draft
+item:
+  - item:
+      - type: display
+~        linkId: q-2
+    type: group
+~    linkId: q-1
 ---
-a:
-  a:
-    a:
-      a:
-        b: abc
+~resourceType: Questionnaire
+~status: draft
+item:
+  - item:
+      - item:
+          - item:
+              - type: display
+~                linkId: q-4
+~            linkId: q-3
+~            type: group
+~        linkId: q-2
+~        type: group
+~    linkId: q-1
+~    type: group
 ```
 
 Invalid resources:
 ```yaml
-a:
-  a: abc
-  c: abc
+~resourceType: Questionnaire
+~status: draft
+item:
+  - item:
+      - wrongType
+~    type: group
+    linkId: q-1
 ---
-a:
-  a:
-    a:
-      c: abc
+~resourceType: Questionnaire
+~status: draft
+item:
+  - item:
+      - item:
+          - nonExistentField: abc
+~            linkId: q-3
+~            type: group
+~        linkId: q-2
+~        type: group
+~    linkId: q-1
+~    type: group
 ```
 
 ## Nested elements
-The `elements` property define subelement constraints.
+The `elements` property define nested element constraints.
 Syntactically it is an object, with string keys and Element values.
 Semantically it defines behavior of the corresponding fields in data.
 
