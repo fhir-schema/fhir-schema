@@ -110,7 +110,7 @@ constraints:
 ~    required: [system, value]
 ```
 
-> Read more - [Constraints](reference/element.html#requires-and-exclusions)
+Read more - [Constraints](reference/element.html#requires-and-exclusions)
 
 ### 5. Terminology bindings
 
