@@ -29,9 +29,13 @@ A _slice_ of an array is a subarray of the original array to which you can apply
 ## Slice matching
 
 ### Syntax
-**[Type]** property:
+**Type** property:
 - `type` (string: pattern|binding|profile|type)
+
+**Resolve ref (Obtain reference target and perform checks on it?)** property:
 - `resolve-ref` (boolean)
+
+**Pattern / Binding / Profile / Type specification** property:
 - `value` (Object)
 
 A _slice_ of an array is a subarray of the original array. This subarray is selected using match expressions. Let's overview existing match types:
