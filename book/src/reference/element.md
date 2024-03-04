@@ -8,48 +8,38 @@ All properties are optional.
 *[Shape](#shape)* properties
 - `array` (boolean)
 - `scalar` (boolean)
-  
 
 *[Cardinality](#cardinality)* properties
 - `min` (integer)
 - `max` (integer)
 
-
 *[Choice type](#choice-type)* properties
 - `choiceOf` (string)
 - `choices` (array of strings)
-
 
 *[Requires and exclusions](#requires-and-exclusions)* properties
 - `excluded` (array of strings)
 - `required` (array of strings)
 
-
 *[Type reference](#type-reference)* properties
 - `elementReference` (array of strings)
 - `type` (string)
 
-
 *[Nested elements](#nested-elements)* property
 - `elements` (object)
-
 
 *[Constraints](constraint.md)* property
 - `constraints` (Constraint)
 
-
 *[Slicing](slicing.md)* property
 - `slicing` (Slicing)
-
-
-*[Pattern matching (constants definition)](#pattern-matching)* property
-- `fixed` (any)
-- `pattern` (any)
-
 
 *[Terminology binding](#terminology-binding)* property
 - `binding` (Binding): valueset binding\
 
+*[Pattern matching (constants definition)](#pattern-matching)* property
+- `fixed` (any)
+- `pattern` (any)
 
 *[Reference target](#reference-target)* property
 - `refers` (array of strings)
@@ -58,6 +48,7 @@ _[Informational](#informational)_ properties
 - `modifier` (boolean)
 - `mustSupport` (boolean)
 - `summary` (boolean)
+
 
 ## Shape
 There are 2 properties controlling element shape:
