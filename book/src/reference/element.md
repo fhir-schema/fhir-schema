@@ -85,12 +85,23 @@ Consider this part of FHIR R4 Core Patient schema:
 
 Resource example that conforms to schema mentioned earlier:
 ```yaml
-{{#include examples/patient-resource-shape.yaml}}
+~resourceType: Patient
+gender: male
+---
+~resourceType: Patient
+name:
+  - text: John Smith
 ```
 
 Resource example that didn't conform to schema mentioned earlier
 ```yaml
-{{#include examples/invalid-patient-resource-shape.yaml}}
+~resourceType: Patient
+gender:
+  - male
+---
+~resourceType: Patient
+name:
+  text: John Smith
 ```
 
 ## Cardinality
@@ -106,34 +117,55 @@ Absent cardinality property means this cardinality is not restricted.
 ### Example
 Schema
 ```yaml
+~url: http://example.org/StructureDefinition/patient-minmax
+~base: http://hl7.org/fhir/StructureDefinition/Patient
+~type: Patient
+~derivation: constraint
 elements:
-  array:
-    type: string
+  name:
     min: 2
     max: 3
 ```
 
 Valid resources
 ```yaml
-array:
-  - a
-  - b
-  - c
+~resourceType: Patient
+name:
+  - text: James
+  - text: Mary
+~meta:
+~  profile:
+~    - http://example.org/StructureDefinition/patient-minmax
 ---
-array:
-  - a
-  - b
+~resourceType: Patient
+name:
+  - text: James
+  - text: Mary
+  - text: Robert
+~meta:
+~  profile:
+~    - http://example.org/StructureDefinition/patient-minmax
 ```
 Invalid resources:
 ```yaml
-array:
-  - a
+~resourceType: Patient
+name:
+  - text: James
+  - text: Mary
+  - text: Robert
+~meta:
+~  profile:
+~    - http://example.org/StructureDefinition/patient-minmax
 ---
-array:
-  - a
-  - b
-  - c
-  - d
+~resourceType: Patient
+name:
+  - text: James
+  - text: Mary
+  - text: Robert
+  - text: Patricia
+~meta:
+~  profile:
+~    - http://example.org/StructureDefinition/patient-minmax
 ```
 
 ## Choice type
@@ -163,32 +195,26 @@ Vice versa every concrete polymorphic type element specifies it polymorphic name
 ### Example
 Schema
 ```yaml
-elements:
-  smth:
-    choices: [smthString, smthCode]
-  smthCode:
-    type: code
-    choiceOf: smth
-  smthString:
-    type: string
-    choiceOf: smth
+{{#include examples/patient-choice.yaml}}
 ```
 
 Valid resources:
 ```yaml
-smthCode: some-code
+multipleBirthBoolean: true
 ---
-smthString: abc
+multipleBirthInteger: 3
 ```
 
 Invalid resources:
 ```yaml
-smthCode: some-code
-smthString: abc
+multipleBirthBoolean: true
+multipleBirthInteger: 3
 ---
-smthMarkdown: abc
+multipleBirthString: "3"
 ---
-smth: abc
+multipleBirth: true
+---
+multipleBirth: 3
 ```
 
 ## Requires and exclusions

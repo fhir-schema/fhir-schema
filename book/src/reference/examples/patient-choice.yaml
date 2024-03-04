@@ -1,12 +1,12 @@
 ~id: Patient
-~url: http://hl7.org/fhir/StructureDefinition/Patient
+url: http://hl7.org/fhir/StructureDefinition/Patient
 ~package-meta:
 ~  name: hl7.fhir.r4.core
 ~  version: 4.0.1
 ~  path: "/tmp/lw-fhir-schema-repository/hl7.fhir.r4.core#4.0.1"
 ~base: http://hl7.org/fhir/StructureDefinition/DomainResource
 ~kind: resource
-type: Patient
+~type: Patient
 ~derivation: specialization
 elements:
 ~  deceasedBoolean:
@@ -33,19 +33,19 @@ elements:
 ~    scalar: true
 ~    summary: true
 ~    type: Reference
-  gender:
-    binding:
-      valueSet: http://hl7.org/fhir/ValueSet/administrative-gender
-      strength: required
+~  gender:
+~    binding:
+~      valueSet: http://hl7.org/fhir/ValueSet/administrative-gender
+~      strength: required
 ~      codesystems:
 ~        - http://hl7.org/fhir/administrative-gender
 ~    type: code
 ~    scalar: true
 ~    summary: true
-~  multipleBirth:
-~    choices:
-~      - multipleBirthBoolean
-~      - multipleBirthInteger
+  multipleBirth:
+    choices:
+      - multipleBirthBoolean
+      - multipleBirthInteger
 ~    scalar: true
 ~  name:
 ~    summary: true
@@ -91,10 +91,10 @@ elements:
 ~    scalar: true
 ~    summary: true
 ~    type: date
-~  multipleBirthBoolean:
+  multipleBirthBoolean:
 ~    scalar: true
-~    type: boolean
-~    choiceOf: multipleBirth
+    type: boolean
+    choiceOf: multipleBirth
 ~  communication:
 ~    required:
 ~      - language
@@ -171,7 +171,7 @@ elements:
 ~      period:
 ~        scalar: true
 ~        type: Period
-~  multipleBirthInteger:
+  multipleBirthInteger:
 ~    scalar: true
-~    type: integer
-~    choiceOf: multipleBirth
+    type: integer
+    choiceOf: multipleBirth
