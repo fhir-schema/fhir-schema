@@ -1,0 +1,177 @@
+~id: Patient
+url: http://hl7.org/fhir/StructureDefinition/Patient
+~package-meta:
+~  name: hl7.fhir.r4.core
+~  version: 4.0.1
+~  path: "/tmp/lw-fhir-schema-repository/hl7.fhir.r4.core#4.0.1"
+~base: http://hl7.org/fhir/StructureDefinition/DomainResource
+~kind: resource
+~type: Patient
+~derivation: specialization
+elements:
+~  deceasedBoolean:
+~    scalar: true
+~    summary: true
+~    modifier: true
+~    type: boolean
+~    choiceOf: deceased
+~  maritalStatus:
+~    binding:
+~      valueSet: http://hl7.org/fhir/ValueSet/marital-status
+~      strength: extensible
+~    scalar: true
+~    type: CodeableConcept
+~  deceasedDateTime:
+~    scalar: true
+~    summary: true
+~    modifier: true
+~    type: dateTime
+~    choiceOf: deceased
+~  managingOrganization:
+~    refers:
+~      - http://hl7.org/fhir/StructureDefinition/Organization
+~    scalar: true
+~    summary: true
+~    type: Reference
+~  gender:
+~    binding:
+~      valueSet: http://hl7.org/fhir/ValueSet/administrative-gender
+~      strength: required
+~      codesystems:
+~        - http://hl7.org/fhir/administrative-gender
+~    type: code
+~    scalar: true
+~    summary: true
+~  multipleBirth:
+~    choices:
+~      - multipleBirthBoolean
+~      - multipleBirthInteger
+~    scalar: true
+~  name:
+~    summary: true
+~    type: HumanName
+~    array: true
+~  address:
+~    summary: true
+~    type: Address
+~    array: true
+~  identifier:
+~    summary: true
+~    type: Identifier
+~    array: true
+~  photo:
+~    type: Attachment
+~    array: true
+  link:
+~    summary: true
+~    modifier: true
+~    required:
+~      - other
+~      - type
+~    type: BackboneElement
+~    array: true
+    elements:
+      other:
+        refers:
+          - http://hl7.org/fhir/StructureDefinition/Patient
+          - http://hl7.org/fhir/StructureDefinition/RelatedPerson
+~        scalar: true
+~        summary: true
+        type: Reference
+      type:
+        binding:
+          valueSet: http://hl7.org/fhir/ValueSet/link-type
+          strength: required
+          codesystems:
+            - http://hl7.org/fhir/link-type
+~        scalar: true
+~        summary: true
+        type: code
+~  birthDate:
+~    scalar: true
+~    summary: true
+~    type: date
+~  multipleBirthBoolean:
+~    scalar: true
+~    type: boolean
+~    choiceOf: multipleBirth
+~  communication:
+~    required:
+~      - language
+~    type: BackboneElement
+~    array: true
+~    elements:
+~      language:
+~        binding:
+~          valueSet: http://hl7.org/fhir/ValueSet/languages
+~          strength: preferred
+~        scalar: true
+~        type: CodeableConcept
+~      preferred:
+~        scalar: true
+~        type: boolean
+~  telecom:
+~    summary: true
+~    type: ContactPoint
+~    array: true
+~  active:
+~    scalar: true
+~    summary: true
+~    modifier: true
+~    type: boolean
+~  deceased:
+~    choices:
+~      - deceasedBoolean
+~      - deceasedDateTime
+~    scalar: true
+~  generalPractitioner:
+~    refers:
+~      - http://hl7.org/fhir/StructureDefinition/Organization
+~      - http://hl7.org/fhir/StructureDefinition/Practitioner
+~      - http://hl7.org/fhir/StructureDefinition/PractitionerRole
+~    type: Reference
+~    array: true
+~  contact:
+~    constraints:
+~      pat-1:
+~        human: SHALL at least contain a contact's details or a reference to an organization
+~        severity: error
+~        expression: name.exists() or telecom.exists() or address.exists() or organization.exists()
+~    type: BackboneElement
+~    array: true
+~    elements:
+~      relationship:
+~        binding:
+~          valueSet: http://hl7.org/fhir/ValueSet/patient-contactrelationship
+~          strength: extensible
+~        type: CodeableConcept
+~        array: true
+~      name:
+~        scalar: true
+~        type: HumanName
+~      telecom:
+~        type: ContactPoint
+~        array: true
+~      address:
+~        scalar: true
+~        type: Address
+~      gender:
+~        binding:
+~          valueSet: http://hl7.org/fhir/ValueSet/administrative-gender
+~          strength: required
+~          codesystems:
+~            - http://hl7.org/fhir/administrative-gender
+~        scalar: true
+~        type: code
+~      organization:
+~        refers:
+~          - http://hl7.org/fhir/StructureDefinition/Organization
+~        scalar: true
+~        type: Reference
+~      period:
+~        scalar: true
+~        type: Period
+~  multipleBirthInteger:
+~    scalar: true
+~    type: integer
+~    choiceOf: multipleBirth

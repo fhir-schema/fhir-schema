@@ -427,35 +427,24 @@ Semantically it defines behavior of the corresponding fields in data.
 ### Example
 Schema
 ```yaml
-elements:
-  a:
-    type: string
-  b:
-    c:
-      type: string
+{{#include examples/nested-elements.yaml}}
 ```
 
-Valid resources
+Valid resource
 ```yaml
-a: abc
----
-a: abc
-b:
-  c: abc
----
-b:
-  c: abc
+resourceType: Patient
+link: 
+  - other: 
+      reference: http://example.org/patient-path
+      type: Patient
+    type: refer
 ```
 
-Invalid resources
+Invalid resource
 ```yaml
-a: 1
----
-b:
-  a: abc
----
-b:
-  c: 1
+resourceType: Patient
+link: 
+  - unexisting: true
 ```
 
 ## Terminology binding
