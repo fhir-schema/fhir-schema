@@ -2,14 +2,35 @@
 Slicing is an *Element* property that dividing an arrays to sub-arrays with specific constraints on each sub-array.
 
 ## Syntax
-- `slices` (object of *[Slice](slice.md)*)
+[_Slices_](#slices) in slicing
+- `slices` (object)
+
+[_Ordered_](#slicing-order) flag
 - `ordered` (boolean)
+
+Slicing [_rules_](#slicing-rules) type
 - `rules` (string)
+
+## Slices
+There can be multiple slices in slicing.
+The value of the `slices` property is an object, where keys are slice names,
+and values are [slice elements](slice.md).
+
+That is, `slices` property looks like:
+```yaml
+slices:
+  slice-name-1: <slice>
+  slice-name-2: <slice>
+```
+> Note: slice names shall be unique per schema.
+
 
 ## Slicing order
 Property `ordered` forces special order for slices. 
 
-If the `ordered` property is true, each slice requires an `order` property, which is the number in the order of the slices. Items in the list must be ordered to match slices in the specified order.
+If the `ordered` property is true, each slice requires an `order` property,
+which is the number in the order of the slices.
+Items in the list must be ordered to match slices in the specified order.
 
 ### Example 
 #### Schema

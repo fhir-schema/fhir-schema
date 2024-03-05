@@ -4,27 +4,24 @@ A _slice_ of an array is a subarray of the original array to which you can apply
 
 
 ## Syntax
-*[Slice ID](#slice-id)* property:
-- `<your-slice-id>` (string)
+_[Match](#slice-matching)_ property:
+- `match` (Match)
+  
+_[Cardinality](#cardinality)_ properties:
+- `min` (integer)
+- `max` (integer)
 
-  *[Match](#slice-matching)* property:
-  -`match` (Match)
-  
-  *[Cardinality](#cardinality)* properties:
-  -`min` (integer)
-  -`max` (integer)
-  
-  *[Order](#order)* property:
-  -`order` (integer)
-  
-  *[Reslice](#reslice)* property:
-  -`reslice` (string)
-  
-  *[Constrain existing slice](#constraining-existing-slice)* property:
-  -`sliceIsConstraining` (boolean)
-  
-  *[Schema](element.md)* property
-  - `schema` (Element)
+_[Order](#order)_ property:
+- `order` (integer)
+
+_[Reslice](#reslice)_ property:
+- `reslice` (string)
+
+_[Constrain existing slice](#constraining-existing-slice)_ property:
+- `sliceIsConstraining` (boolean)
+
+_[Schema](element.md)_ property
+- `schema` (Element)
 
 ## Slice matching
 
@@ -307,7 +304,7 @@ Defines the slice order in the case of ordered slicing. Please refer to [ordered
 
 ## Reslice
 
-It's sometimes necessary to slice data that has already been sliced in the base profile - that is, create new slices within the existing slices. This is called "Re-slicing". Using `reslice` property you can refer to an existing slice and start re-slicing definition.
+It's sometimes necessary to slice data that has already been sliced in the base profile - that is, create new slices within the existing slices. This is called _Re-slicing_. Using `reslice` property you can refer to an existing slice and start re-slicing definition.
 
 Consider this two custom schemas:
 
@@ -322,7 +319,7 @@ Consider this two custom schemas:
 ```yaml
 {{#include examples/patient-slice-re-slice-bar.yaml}}
 ```
-> Human interpretation of the slice: _Within elements matched to the homeaddress slice, there should be a maximum of 2 elements with text: use._
+> Human interpretation of the slice: _Within elements matched to the homeaddress slice, there should be a maximum of 2 elements with text: foo._
 
 ### Valid case
 The following addresses will be matched into the slices defined earlier:
@@ -408,7 +405,7 @@ Reserved slice ID, you can mention this slice only if you have closed slicing; a
 
 Consider following custom schema:
 
-```
+```yaml
 base: http://hl7.org/fhir/StructureDefinition/Patient
 type: Patient
 elements:
