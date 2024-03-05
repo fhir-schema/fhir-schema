@@ -47,7 +47,7 @@ elements:
 
 Read more - [Requires and exclusions](/reference/element.html#requires-and-exclusions)
 
-### 3. Slicing
+### 4. Slicing
 
 Describe slicing on extensions using a short notation. Specify that in Patient.extension, there can be four extensions, and no more than one of each.
 
@@ -77,7 +77,7 @@ extensions:
 
 Read more - [Slicing](/reference/slicing.html)
 
-### 4. Constraints
+### 5. Constraints
 Describe a constraint using FHIRPath syntax that define the rule:
 
 A patient's name must contain either a family name or a given name; otherwise, there must be an extension explaining the absence of the name.
@@ -112,7 +112,7 @@ constraints:
 
 Read more - [Constraints](/reference/constraint.html)
 
-### 5. Terminology bindings
+### 6. Terminology bindings
 
 Specify the terminological bindings for coded values.
 
@@ -175,9 +175,9 @@ elements:
           valueSet: http://hl7.org/fhir/us/core/ValueSet/simple-language
 ```
 
-> Read more - [Terminology bindings](/reference/element.html#terminology-binding)
+Read more - [Terminology bindings](/reference/element.html#terminology-binding)
 
-### 6. Flags
+### 7. Flags
 
 Indicate the **mustSupport** flag to describe that systems claiming to conform to a given profile must "support" the element.
 
