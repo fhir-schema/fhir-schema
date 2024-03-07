@@ -43,7 +43,7 @@ In summary, FHIR Schema is a  project that aims to make FHIR more accessible and
 
 ## 2. Specification
 
-See [wiki](https://github.com/fhir-schema/fhir-schema/wiki)
+See [wiki](https://fhir-schema.github.io/fhir-schema/)
 
 
 ## License
