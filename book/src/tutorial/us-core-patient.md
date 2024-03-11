@@ -10,7 +10,7 @@ Since the profile describe the patient structure, it is important to inherit fro
 base: Patient
 ```
 
-Read more - [Base type](/reference/schema.html#base)
+Read more - *[Base type](/reference/schema.html#base)*
 
 ### 2. Profile Identifier
 Specify the profile's global canonical identifier.
@@ -20,7 +20,7 @@ Specify the profile's global canonical identifier.
 url: http://hl7.org/fhir/us/core/StructureDefinition/us-core-patient
 ```
 
-Read more - [Profile url](/reference/schema.html#url)
+Read more - *[Profile url](/reference/schema.html#url)*
 
 ### 3. Required elements
 
@@ -45,7 +45,7 @@ elements:
     required: [system, value]
 ```
 
-Read more - [Requires and exclusions](/reference/element.html#requires-and-exclusions)
+Read more - *[Requires and exclusions](/reference/element.html#requires-and-exclusions)*
 
 ### 4. Slicing
 
@@ -75,7 +75,7 @@ extensions:
 ~    required: [system, value]
 ```
 
-Read more - [Slicing](/reference/slicing.html)
+Read more - *[Slicing](/reference/slicing.html)*
 
 ### 5. Constraints
 Describe a constraint using FHIRPath syntax that define the rule:
@@ -110,7 +110,7 @@ constraints:
 ~    required: [system, value]
 ```
 
-Read more - [Constraints](/reference/constraint.html)
+Read more - *[Constraints](/reference/constraint.html)*
 
 ### 6. Terminology bindings
 
@@ -175,7 +175,7 @@ elements:
           valueSet: http://hl7.org/fhir/us/core/ValueSet/simple-language
 ```
 
-Read more - [Terminology bindings](/reference/element.html#terminology-binding)
+Read more - *[Terminology bindings](/reference/element.html#terminology-binding)*
 
 ### 7. Flags
 
@@ -265,4 +265,4 @@ elements:
 ~          valueSet: http://hl7.org/fhir/us/core/ValueSet/simple-language
 ```
 
-Read more - [Element flags](/reference/element.html#informational)
+Read more - *[Element flags](/reference/element.html#informational)*
