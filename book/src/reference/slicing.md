@@ -171,21 +171,22 @@ address:
 ~name: Patient-slicing
 elements:
   address:
-    rules: openAtEnd
-    ordered: true
-    slices:
-      home:
-        order: 0
-        match:
-          type: pattern
-          value:
-            use: home
-      work:
-        order: 1
-        match:
-          type: pattern
-          value:
-            use: work
+    slicing:
+      rules: openAtEnd
+      ordered: true
+      slices:
+        home:
+          order: 0
+          match:
+            type: pattern
+            value:
+              use: home
+        work:
+          order: 1
+          match:
+            type: pattern
+            value:
+              use: work
 ```
 
 #### Invalid resource
