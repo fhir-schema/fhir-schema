@@ -9,7 +9,7 @@ which are applied on top of base schemas.
 
 *All properties are required*
 
-*[Base type](#base-type)* property
+*[Base type](#base)* property
 
 - `base` : string
 
@@ -17,7 +17,7 @@ which are applied on top of base schemas.
 
 - `url` : string
 
-*[Resource type](#base-type)* property
+*[Resource type](#resource-type)* property
 
 - `type` : string
 
