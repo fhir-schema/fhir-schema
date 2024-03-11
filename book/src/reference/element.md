@@ -102,10 +102,12 @@ There are 2 properties controlling element cardinality:
 - `min`
 - `max`
 
-Cardinality defines minimum and maximum number of array element.
-Cardinality properties are allowed only if `array` is set.
+Cardinality defines the minimum and maximum number of elements in an array.
+These properties are allowed only if the [shape](#shape) is set to 'array'.
 
-Absent cardinality property means this cardinality is not restricted.
+
+Absent cardinality property means this cardinality is not restricted. 
+The schema may contain only `min` or `max` properties, or it may omit both.
 
 ### Example
 #### Schema
@@ -145,8 +147,6 @@ name:
 ~resourceType: Patient
 name:
   - text: James
-  - text: Mary
-  - text: Robert
 ~meta:
 ~  profile:
 ~    - http://example.org/StructureDefinition/patient-minmax
@@ -164,57 +164,117 @@ name:
 ```
 
 ## Choice type
-There are 2 properties controlling polymorphism:
+
+In FHIR, polymorphic types are used to allow values of different types for specific fields.
+
+```yaml
+~resourceType: Patient
+multipleBirthBoolean: true
+```
+
+```yaml
+~resourceType: Patient
+multipleBirthInteger: 2
+```
+
+In the example provided above, `multipleBirth[x]` is a choice type element, the value of which can either be of the boolean type (`multipleBirthBoolean`) or the integer type (`multipleBirthInteger`).
+
+The concurrent presence of the `multipleBirthBoolean` field and the `multipleBirthInteger` field in the data is not allowed.
+
+There are 2 properties controlling that polymorphism:
+- `choices` 
 - `choiceOf`
-- `choices`
 
-In FHIR polymorhpic types are used to allow values of different types, for instance
+### choices
+This property is intended for the enumeration of available polymorphic type elements.
+
+#### Example
+
 ```yaml
-valueString: abc
+~url: http://example.org/StructureDefinition/patient-choice-type
+~base: http://hl7.org/fhir/StructureDefinition/Patient
+~derivation: constraint
+elements:
+  multipleBirth:
+    choices:
+      - multipleBirthBoolean
+      - multipleBirthInteger
+~  multipleBirthBoolean:
+~    choiceOf: multipleBirth
+~    type: boolean
+~  multipleBirthInteger:
+~    type: integer
+~    choiceOf: multipleBirth
 ```
+
+### choiceOf
+
+Every concrete polymorphic type element specifies its polymorphic name under the `choiceOf` property.
+
+#### Example
+
 ```yaml
-valueCode: some-code
-```
-```yaml
-valueCoding:
-  system: some-system
-  value: some-value
-```
-
-In this example `value` is the name of a polymorphic type, in FHIR it is denoted as `value[x]`;
-`valueString`, `valueCode` are names of concrete polymorphic fields.
-
-To represent this, polymorhpic type element lists all concrete polymorphic types
-under the `choices` property.
-
-Vice versa every concrete polymorphic type element specifies it polymorphic name under the `choiceOf` property.
-
-### Example
-#### Schema
-```yaml
-{{#include examples/patient-choice.yaml}}
+~url: http://example.org/StructureDefinition/patient-choice-type
+~base: http://hl7.org/fhir/StructureDefinition/Patient
+~derivation: constraint
+elements:
+~  multipleBirth:
+~    choices:
+~      - multipleBirthBoolean
+~      - multipleBirthInteger
+  multipleBirthBoolean:
+    choiceOf: multipleBirth
+    type: boolean
+  multipleBirthInteger:
+    type: integer
+    choiceOf: multipleBirth
 ```
 
 #### Valid resources:
 ```yaml
+~resourceType: Patient
+~meta:
+~  profile:
+~    - http://example.org/StructureDefinition/patient-choice-type
 multipleBirthBoolean: true
 ```
+
 ```yaml
+~resourceType: Patient
+~meta:
+~  profile:
+~    - http://example.org/StructureDefinition/patient-choice-type
 multipleBirthInteger: 3
 ```
 
 #### Invalid resources:
 ```yaml
+~resourceType: Patient
+~meta:
+~  profile:
+~    - http://example.org/StructureDefinition/patient-choice-type
 multipleBirthBoolean: true
 multipleBirthInteger: 3
 ```
 ```yaml
+~resourceType: Patient
+~meta:
+~  profile:
+~    - http://example.org/StructureDefinition/patient-choice-type
 multipleBirthString: "3"
 ```
 ```yaml
+~resourceType: Patient
+~meta:
+~  profile:
+~    - http://example.org/StructureDefinition/patient-choice-type
 multipleBirth: true
 ```
 ```yaml
+~resourceType: Patient
+~meta:
+~  profile:
+~    - http://example.org/StructureDefinition/patient-choice-type
 multipleBirth: 3
 ```
 
@@ -285,7 +345,7 @@ There are 2 properties specifying type references:
 - `type`
 - `elementReference`
 
-These two proeprties are mutually exclusive.
+These two properties are mutually exclusive.
 
 Type reference is either a FHIR type name or canonical URL of the FHIR type.
 
@@ -475,7 +535,7 @@ Syntax
 FHIRSchema terminology binding follows FHIR terminology binding.
 Both `valueSet` and `strength` properties shall be specified.
 
-The `valueSet` property is a canonical URL referring the ValueSet
+The `valueSet` property is a canonical URL referring to the ValueSet
 to which the codes in the data element value are bound.
 The `strength` property specifies FHIR ValueSet binding strength.
 Only `required` bindings are validated.
@@ -504,7 +564,7 @@ gender: something-not-in-the-valueset
 ```
 
 ### Reference target
-The `refers` property lists allowed reference targets.
+The `refers` property lists allows reference targets.
 A reference data element is accepted only if it refers to one of the allowed here types.
 A target can be either resource type or canonical URL for this resource type.
 
