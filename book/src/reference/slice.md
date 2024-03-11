@@ -76,6 +76,14 @@ value: some-value
 
 If you are slicing a reference array and want to check your pattern against the **actual** reference target, **not** the reference data element, add the `resolve-ref: true` declaration.
 
+Consider FHIR R4 lipidprofile:
+
+```yaml
+{{#include examples/lipidprofile-slices.yaml}}
+```
+
+> Human interpretation of the slice: _The first reference should point to a cholesterol resource that contains the same `code` as used in the `value` property._ 
+
 ### Binding
 
 This matcher enables the specification of a terminology binding that will be checked against each element in the source array. 

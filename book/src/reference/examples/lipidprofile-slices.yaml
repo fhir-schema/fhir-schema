@@ -1,0 +1,115 @@
+~url: http://hl7.org/fhir/StructureDefinition/lipidprofile|4.0.1
+~package-meta:
+~  name: hl7.fhir.r4.core
+~  version: 4.0.1
+~  path: test/fixtures/hl7.fhir.r4.core#4.0.1
+~excluded:
+~- conclusionCode
+~id: lipidprofile
+~base: http://hl7.org/fhir/StructureDefinition/DiagnosticReport|4.0.1
+~kind: resource
+~required:
+~- code
+~type: http://hl7.org/fhir/StructureDefinition/DiagnosticReport|4.0.1
+~datatype: DiagnosticReport
+ elements:
+~  code:
+~    fixed:
+~      coding:
+~      - system: http://loinc.org
+~        code: 57698-3
+~        display: Lipid panel with direct LDL - Serum or Plasma
+~    type: http://hl7.org/fhir/StructureDefinition/CodeableConcept|4.0.1
+~    datatype: CodeableConcept
+   result:
+     slicing:
+~      discriminator:
+~      - type: value
+~        path: resolve().code
+~      ordered: true
+~      rules: closed
+       slices:
+         Cholesterol:
+~          schema:
+~           refers:
+~           - http://hl7.org/fhir/StructureDefinition/cholesterol|4.0.1
+~            mustSupport: true
+~            type: http://hl7.org/fhir/StructureDefinition/Reference|4.0.1
+~            datatype: Reference
+          min: 1
+          max: 1
+          order: 0
+           match:
+             type: pattern
+             resolve-ref: true
+             value:
+               code:
+                 coding:
+                 - system: http://loinc.org
+                   code: 35200-5
+                   display: Cholesterol [Moles/​volume] in Serum or Plasma
+~        Triglyceride:
+~          schema:
+~            refers:
+~            - http://hl7.org/fhir/StructureDefinition/triglyceride|4.0.1
+~            mustSupport: true
+~            type: http://hl7.org/fhir/StructureDefinition/Reference|4.0.1
+~            datatype: Reference
+~          min: 1
+~          max: 1
+~          order: 1
+~          match:
+~            type: pattern
+~            resolve-ref: true
+~            value:
+~              code:
+~                coding:
+~                - system: http://loinc.org
+~                  code: 35217-9
+~                  display: Triglyceride [Moles/​volume] in Serum or Plasma
+~        HDLCholesterol:
+~          schema:
+~            refers:
+~            - http://hl7.org/fhir/StructureDefinition/hdlcholesterol|4.0.1
+~            mustSupport: true
+~            type: http://hl7.org/fhir/StructureDefinition/Reference|4.0.1
+~            datatype: Reference
+~          min: 1
+~          max: 1
+~          order: 2
+~          match:
+~            type: pattern
+~            resolve-ref: true
+~            value:
+~              code:
+~                coding:
+~                - system: http://loinc.org
+~                  code: 2085-9
+~                  display: HDL Cholesterol
+~        LDLCholesterol:
+~          schema:
+~            refers:
+~            - http://hl7.org/fhir/StructureDefinition/ldlcholesterol|4.0.1
+~            mustSupport: true
+~            type: http://hl7.org/fhir/StructureDefinition/Reference|4.0.1
+~            datatype: Reference
+~          min: 0
+~          max: 1
+~          order: 3
+~          match:
+~            type: binding
+~            resolve-ref: true
+~            value:
+~              code:
+~                valueSet: http://hl7.org/fhir/ValueSet/ldlcholesterol-codes
+~                strength: required
+~    array: true
+~  conclusion:
+~    min: 0
+~    max: 1
+~    mustSupport: true
+~    type: http://hl7.org/fhir/StructureDefinition/string|4.0.1
+~    datatype: string
+~  conclusionCode:
+~    type: http://hl7.org/fhir/StructureDefinition/CodeableConcept|4.0.1
+~    datatype: CodeableConcept
