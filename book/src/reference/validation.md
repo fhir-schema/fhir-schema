@@ -68,7 +68,6 @@ The schemata set changes:
 1. _collect_: US Core Patient schema, FHIR R4 patient schema
 1. _collect_: US Core Patient, R4 Patient, R4 DomainResource
 1. _collect_: US Core Patient, R4 Patient, R4 DomainResource, R4 Resource
-1. _collect_: US Core Patient, R4 Patient, R4 DomainResource, R4 Resource
 1. _collect_: US Core Patient, R4 Patient, R4 DomainResource, R4 Resource (stops growing)
 1. _follow_: US Core Patient name element, R4 Patient name element
 1. _collect_: US Core Patient name element, R4 Patient name element, R4 HumanName
