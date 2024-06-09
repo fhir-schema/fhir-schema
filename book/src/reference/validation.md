@@ -25,7 +25,7 @@ More formally, let _getBaseSchema_ be a function which accepts a root schema and
 - empty set, otherwise
 
 Let _getTypeSchema_ be a function which accepts an element schema and returns
-- a singleton set with the schema referred by the `elementReference` property,
+- a singleton set with the schema referred by the `type` property,
   if both the property is present and the referred schema exists,
 - empty set, otherwise
 
