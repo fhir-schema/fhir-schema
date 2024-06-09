@@ -98,18 +98,18 @@ function validateSchemasArray(ctx, result, schemas, data){
 
 
 // validate(schemas, data)
-// each schemas s
-//    each s.keyword
-//       validate_keyword(data)
-// each data (k, v)=>
-//   el-schs = schemas_for_key(k)
-//   if el-schs empty => error(unkown key)
-//   if array(v)
-//      validateArray(el-schs, v)
-//      each v
+//   each schemas s
+//      each s.keyword
+//         validate_keyword(data)
+//   each data (k, v)=>
+//     el-schs = schemas_for_key(k)
+//     if el-schs empty => error(unkown key)
+//     if array(v)
+//        validateArray(el-schs, v)
+//        each v
+//          validate(el-schs, v)
+//     else
 //        validate(el-schs, v)
-//   else
-//      validate(el-schs, v)
 
 function validateSchemas(ctx, result, schemas, data){
   console.log('>', Object.keys(schemas).join(', '), '|||', result.path.join('.') )
