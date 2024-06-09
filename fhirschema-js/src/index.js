@@ -16,7 +16,9 @@ function validateMin(ctx, result, schema, data) {
 }
 
 function validateArray(ctx, result, schema, data) {
-  console.log('  array', schema, JSON.stringify(data))
+  if(!Array.isArray(data)){
+    result.errors.push({type: 'not-array', path: result.path.join('.')})
+  }
 }
 
 function isMap(x){
@@ -28,6 +30,9 @@ function isMap(x){
 let VALIDATORS = {
   'require': validateRequire,
   'type': validateType,
+}
+
+let ARRAY_VALIDATORS = {
   'array': validateArray,
   'max': validateMax,
   'min': validateMin
@@ -80,6 +85,17 @@ function addSchemaToSet(ctx, set, schema){
   }
 }
 
+function validateSchemasArray(ctx, result, schemas, data){
+  each(schemas, (schk, sch)=>{
+    each(sch, (k, val)=>{
+      let validator=ARRAY_VALIDATORS[k];
+      if(validator){
+        validator(ctx,result, val, data)
+      }
+    })
+  })
+}
+
 function validateSchemas(ctx, result, schemas, data){
   console.log('>', Object.keys(schemas).join(', '), '|||', result.path.join('.') )
   each(schemas, (schk, sch)=>{
@@ -89,7 +105,7 @@ function validateSchemas(ctx, result, schemas, data){
         validator(ctx,result, val, data)
       }
     })
-  })
+      })
   if(isMap(data)) {
     each(data, (k,v)=>{
       let elset = set()
@@ -105,9 +121,10 @@ function validateSchemas(ctx, result, schemas, data){
         result.errors.push({type: 'unknown-element', path: '.' + result.path.join('.'), message: `${k} unknown`})
       } else {
         if(Array.isArray(v)){
+          validateSchemasArray(ctx,result,elset,v)
           v.forEach((x,i)=>{
             result.path.push(i)
-            validateSchemas(ctx, result, elset, v)
+            validateSchemas(ctx, result, elset, x)
             result.path.pop()
           })
         } else {
@@ -129,19 +146,19 @@ export function validate(ctx, schemaNames, data) {
   return result
 }
 
-// 1. walk schemas
-//    * walk keyword  - run keyword (elements is not keyword)
-//    * walk data -> enter element (resolveSchemas and types, recur)
-
-
-//  we have two schemas S1 and S2
-//  validate require/exclude and others (skip elements)
-//  walk data (k, v)=>
-//    if none schs recoginized k => error (empty? schs)
-//    schs = #{ S1.elements[k], S2.elements[k], resolveType }
-//    validate(schs, v)
-//
-//  would slices work this way?
+// validate(schemas, data)
+// each schemas s
+//    each s.keyword
+//       validate_keyword(data)
+// each data (k, v)=>
+//   el-schs = schemas_for_key(k)
+//   if el-schs empty => error(unkown key)
+//   if array(v)
+//      validateArray(el-schs, v)
+//      each v
+//        validate(el-schs, v)
+//   else
+//      validate(el-schs, v)
 
 let ctx = {
   resource: {
