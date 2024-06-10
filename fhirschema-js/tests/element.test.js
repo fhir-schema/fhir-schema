@@ -1,37 +1,41 @@
 import { expect, test , describe, beforeAll, afterAll} from "bun:test";
 import { validate } from '../src/index.js'
 
-
-let resource = {
-  name: 'Resource',
-  elements: {
-    id: {
-      type: 'string'
+let ctx = {
+  Resource: {
+    name: 'Resource',
+    elements: {
+      id: {
+        type: 'string'
+      }
     }
   }
 }
 
-let patient = {
-  name: 'Patient',
-  base: 'Resource',
-  elements: {
-    name: {
-      type: 'string'
-    }
-  }
-}
-
-
-let ctx = {'Resource': resource, 'Patient': patient}
-
+let valid = {errors: []}
 test("elements", () => {
-  expect(validate(ctx, {}, {}))
-    .toEqual([])
 
-  expect(validate(ctx, ['Resource'], {ups: 'ups'}))
-    .toEqual({errors: [{type: 'extra-element'}]})
+  expect(validate(ctx, ['Resource'], {resourceType: 'Patient', id: 'r1'}))
+    .toEqual(valid)
 
-  expect(validate(ctx, ['Resource'], {name: 1}))
-    .toEqual({errors: [{type: 'type'}]})
+  expect(validate(ctx, ['Resource'], {resourceType: 'Patient', id: 1}))
+    .toEqual({
+      errors: [{
+        message: "expected string, got number",
+        path: "Patient.id",
+        type: "type",
+      }]
+    })
+
+  expect(validate(ctx, ['Resource'], {resourceType: 'Patient', name: [{family: 'Smith'}]}))
+    .toEqual({
+      errors: [
+        {
+          message: "name is unknown",
+          path: "Patient.name",
+          type: "unknown-element",
+        }
+      ]
+    })
 
 });
