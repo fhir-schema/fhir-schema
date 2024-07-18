@@ -1,6 +1,17 @@
 # Extensions
 
-To extend the posibilities of basic FHIR, FHIR-Schema can be extended via incompatible _Extensions_.
+<div class="warning">
+Extensions make schemas incompatible with FHIR!
+
+Use only if there is no other way to model your data.
+</div>
+
+
+FHIR-Schema defines optional extensions.
+These extensions allow to model data not representable in FHIR otherwise.
+However when using these extensions it is not possible to convert FHIR-Schema into equivalent
+StructureDefinition.
+
 
 ## Enable Fhir-schema extensions
 To enable FHIR-Schema extensions, the following key must be present at the top level of a FHIR-Schema definition:
@@ -8,9 +19,12 @@ To enable FHIR-Schema extensions, the following key must be present at the top l
 ALLOW_FHIR_SCHEMA_FHIR_INCOMPATIBLE_EXTENSIONS: true
 ```
 
-> Note: Any extensions are allowed ONLY for schemas with _derivation_: _specialization_
+Any extensions are allowed ONLY for schemas with 
+```yaml
+derivation: specialization
+```
 
-> Note: Any extensions found in the schema while the key described above is not present, the schema is rejected as invalid.
+If any extensions found in the schema while the key described above is not present, the schema is rejected as invalid.
 
 ## Available extensions
 
@@ -35,7 +49,7 @@ The `any` property exlusive with any other properties:
 - If there are multiple schemas for an element, where at least one specifies the `any` property, it will be rejected as invalid.
 - If there are multiple schemas for an element, where at least one specifies _any other property_, it will be rejected as invalid.
 
-#### Example of exclusive usage 
+For example, this is prohibited:
 ```yaml
 ALLOW_FHIR_SCHEMA_FHIR_INCOMPATIBLE_EXTENSIONS: true
 url: schema-1
@@ -60,7 +74,10 @@ additionalProperties:
 property. Any key which does not correspond to any key defined in the `elements` property is validated using the schema supplied under the `additionalProperties` property.
 
 #### Usage example
-The following example means that any property except `knownElement` is allowed and valid if it is a string value.
+The following example means that any property except `knownElement` and `_knownElement`
+is allowed and valid if it is a string value.
+
+Schema:
 ```yaml
 ALLOW_FHIR_SCHEMA_FHIR_INCOMPATIBLE_EXTENSIONS: true
 url: schema-1
@@ -71,16 +88,23 @@ additionalProperties:
   type: string
 ```
 
-#### Valid resource
+Valid resource:
 ```yaml
 knownElement: 1
+_knownElement:
+  id: test
 unknownElement: stringValue
+_unknownElement: test2
+______: test3
 ```
 
-#### Invalid resource
+Invalid resources:
 ```yaml
 knownElement: 1
 unknownElement: 2
+---
+knownElement: 1
+_knownElement: test
 ```
 
 #### Limitations
@@ -97,3 +121,9 @@ Property resolution behavior:
    of the corresponding element.
 - _Otherwise_, it is interpreted as a normal part of an element specified under
    the `additionalProperties` property (regardless of underscores).
+
+
+## Extensions reserved for future use
+The following properties are reserved for future use:
+- `properties`
+- `additionalElements`
