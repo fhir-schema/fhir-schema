@@ -12,3 +12,4 @@
 - [Constraint](./reference/constraint.md)
 - [Slice](./reference/slice.md)
 - [Slicing](./reference/slicing.md)
+- [Extensions](./reference/extensions.md)
