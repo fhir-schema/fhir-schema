@@ -37,11 +37,11 @@ which are applied on top of base schemas.
 
 - `elements` (object)
 
-*[Constraints](/reference/constraint.md)* property
+*[Constraints](constraint.md)* property
 
 - `constraints`
 
-*[Extensions](#extensions)* property
+*[Extensions](extensions.md)* property
 
 - `extensions`
 
