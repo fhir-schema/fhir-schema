@@ -1,7 +1,6 @@
 # Slice
 
-A _slice_ of an array is a subarray of the original array to which you can apply constraints.
-
+A _slice_ of an array is a subarray of the original array to which you can apply constraints. It is a part of [_Slicing_](#Slicing).
 
 ## Syntax
 _[Match](#slice-matching)_ property:
