@@ -39,23 +39,23 @@ Items in the list must be ordered to match slices in the specified order.
 ~base: http://hl7.org/fhir/StructureDefinition/Patient
 ~type: Patient
 ~name: Patient-slicing
-elements: 
-  address: 
+elements:
+  address:
     slicing:
       ordered: true
-        slices:
-          first:
-            order: 0
-            match:
-              type: pattern
-              value:
-                use: home
-          other:
-            order: 1
-            match:
-              type: pattern
-                value:
-                  use: work
+      slices:
+        first:
+          order: 0
+          match:
+            type: pattern
+            value:
+              use: home
+        other:
+          order: 1
+          match:
+            type: pattern
+            value:
+              use: work
 ```
 
 #### Valid resources
