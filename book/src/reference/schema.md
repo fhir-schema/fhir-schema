@@ -21,6 +21,9 @@ which are applied on top of base schemas.
 
 - `name` : string
 
+*[Derivation](#derivation)* property
+
+- `derivation` : `specialization` or `constraint`
 
 *Optional properties*
 
@@ -93,6 +96,32 @@ gender: true # wrong type
 ~name:
 ~- given:
 ~  - Example name
+```
+
+## Derivation
+
+The `derivation` property defines the type of described object of FHIR Schema: `specialization` for custom resources and `constraint` for profiles (see details: [TypeDerivationRule](https://build.fhir.org/valueset-type-derivation-rule.html))
+
+### Examples
+
+- The custom resource with `specialization`:
+
+```yaml
+url: http://example.com/Foo
+base: http://hl7.org/fhir/StructureDefinition/Resource
+name: Foo
+type: Foo
+derivation: specialization
+```
+
+- The profile with `constraint`:
+
+```yaml
+url: http://example.com/Foo-Bar-profile
+base: Foo
+name: Bar
+type: Foo
+derivation: constraint
 ```
 
 ## URL
