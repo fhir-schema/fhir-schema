@@ -9,10 +9,6 @@ which are applied on top of base schemas.
 
 *All properties are required*
 
-*[Base type](#base)* property
-
-- `base` : string
-
 *[URL](#url)* property
 
 - `url` : string
@@ -25,6 +21,12 @@ which are applied on top of base schemas.
 
 - `name` : string
 
+
+*Optional properties*
+
+*[Base type](#base)* property
+
+- `base` : string
 
 ### Properties shared with *[elements](element.md)*
 
