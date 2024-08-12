@@ -7,6 +7,8 @@ programming languages. It is heavily inspired by the design of JSON Schema and
 introduces a more developer-friendly representation of FHIR
 StructureDefinitions.
 
+FHIR Schema Status: [Trial Use](https://build.fhir.org/versions.html#std-process)
+
 ## Key features
 - Simple and Intuitive Structure 
 - Explicit Arrays
