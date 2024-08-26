@@ -1,3 +1,5 @@
+const fhirpath = require('fhirpath');
+
 function addError(result, type, message) {
   result.errors.push({type: type, path: result.path.join('.'), message: message})
 }
