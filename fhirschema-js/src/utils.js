@@ -1,5 +1,5 @@
-const https = require("https");
-const zlib = require("zlib");
+import https from "https";
+import zlib from "zlib";
 
 const packageRegistryUrl =
   "https://storage.googleapis.com/fhir-schema-registry/1.0.0/";

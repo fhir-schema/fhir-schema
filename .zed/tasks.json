@@ -1,0 +1,12 @@
+// Static tasks configuration.
+//
+// Example:
+[
+  {
+    "label": "bun test \"$ZED_SYMBOL\"",
+    "command": "bun test",
+    "args": ["$ZED_FILE --test-name-pattern \"$ZED_SYMBOL\" "],
+    "tags": ["ts-test", "js-test"],
+    "hide": "on_success"
+  }
+]

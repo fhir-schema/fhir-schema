@@ -1,4 +1,4 @@
-const fhirpath = require("fhirpath");
+import fhirpath from "fhirpath";
 
 function formatValue(v) {
   if (Array.isArray(v)) {
@@ -8,7 +8,7 @@ function formatValue(v) {
 }
 
 function isMap(x) {
-  return x?.constructor == {}.constructor;
+  return x?.constructor === {}.constructor;
 }
 
 function getType(input) {
@@ -35,10 +35,6 @@ function getType(input) {
   }
 }
 
-function isPrimitive(tp) {
-  return tp.toLowerCase() === tp;
-}
-
 function addError(result, type, message) {
   let err = {
     type: type,
@@ -54,16 +50,16 @@ function addError(result, type, message) {
 }
 
 const fhirPrimitiveTypeValidators = {
-  integer: (data, schema, result) =>
+  integer: (data, schema) =>
     Number.isSafeInteger(data)
       ? null
       : `expected ${schema.type}, got ${getType(data)}`,
-  string: (data, schema, result) => {
+  string: (data, schema) => {
     if (!(getType(data) === "string")) {
       return `expected ${schema.type}, got ${getType(data)}`;
     }
   },
-  boolean: (data, schema, result) => {
+  boolean: (data, schema) => {
     if (!(getType(data) === "boolean")) {
       return `expected ${schema.type}, got ${getType(data)}`;
     }
@@ -86,7 +82,7 @@ function validatePrimitiveType(ctx, result, schema, data) {
 
 function validateRequired(ctx, result, schema, data) {
   let tp = getType(data);
-  if (tp == "object") {
+  if (tp === "object") {
     schema.required.forEach((k) => {
       result.path.push(k);
       if (!(k in data)) {
@@ -101,7 +97,7 @@ function validateRequired(ctx, result, schema, data) {
 
 function validateExcluded(ctx, result, schema, data) {
   let tp = getType(data);
-  if (tp == "object") {
+  if (tp === "object") {
     schema.excluded.forEach((k) => {
       result.path.push(k);
       if (k in data) {
@@ -117,7 +113,7 @@ function validateExcluded(ctx, result, schema, data) {
 function ensureArray(data) {
   let tp = getType(data);
   if (tp !== "array") {
-    addError(result, "type", `expected array got ${tp}`);
+    // addError(result, "type", `expected array got ${tp}`);
     return true;
   }
 }
@@ -285,7 +281,7 @@ function checkOnlyOneChoicePresent(metChoices, choiceOf, elementKey, result) {
 function checkChoiceIsIncludedInChoiceList(metChoices, schema, result) {
   each(metChoices, (choiceOf, exactChoices) => {
     const allowedChoices = schema?.elements?.[choiceOf];
-    if (!!allowedChoices) {
+    if (allowedChoices) {
       const notAlowedChoicePresent = exactChoices.some(
         (exactChoice) => !allowedChoices.choices.includes(exactChoice),
       );
@@ -309,7 +305,7 @@ function validateSchemas(ctx, result, schemas, data) {
     const metChoices = {}; // ;; kv "choiceOf" -> choice, candidate for NODE CTX or smth?
 
     each(data, (k, v) => {
-      if (result.root && k == "resourceType") {
+      if (result.root && k === "resourceType") {
         result.root = false;
       } else {
         let elset = set();
@@ -322,7 +318,7 @@ function validateSchemas(ctx, result, schemas, data) {
             addSchemaToSet(ctx, elset, subsch);
 
             const choiceOf = subsch.choiceOf;
-            if (!!choiceOf) {
+            if (choiceOf) {
               checkOnlyOneChoicePresent(metChoices, choiceOf, k, result);
               metChoices[choiceOf] = [...(metChoices[choiceOf] || []), k];
             }

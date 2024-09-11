@@ -1,7 +1,7 @@
-import { expect, test, describe, beforeAll, afterAll } from "bun:test";
+import { expect, test, describe } from "bun:test";
 import { validate } from "../src/index.js";
 
-const createSchemaResolver = (store) => (url, opts) => store[url];
+const createSchemaResolver = (store) => (url, _opts) => store[url];
 
 describe("`choiceOf` directive", () => {
   const ctx = {
