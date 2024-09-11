@@ -12,6 +12,8 @@ describe("primitive types", () => {
     [
       { type: "string", value: "help" },
       { type: "integer", value: 4 },
+      { type: "boolean", value: true },
+      { type: "boolean", value: false },
     ].forEach(({ type, value }) => {
       test(`Should be valid for ${type} with value ${value}`, () => {
         const ctx = {};
@@ -37,6 +39,33 @@ describe("primitive types", () => {
         value: "i'm pretty sure this is not an int",
         error: {
           message: "expected integer, got string",
+          path: "",
+          type: "type",
+        },
+      },
+      {
+        type: "integer",
+        value: "50",
+        error: {
+          message: "expected integer, got string",
+          path: "",
+          type: "type",
+        },
+      },
+      {
+        type: "boolean",
+        value: "true",
+        error: {
+          message: "expected boolean, got string",
+          path: "",
+          type: "type",
+        },
+      },
+      {
+        type: "boolean",
+        value: null,
+        error: {
+          message: "expected boolean, got null",
           path: "",
           type: "type",
         },

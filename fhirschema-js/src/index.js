@@ -46,6 +46,11 @@ const fhirPrimitiveTypeValidators = {
       return `expected ${schema.type}, got ${getType(data)}`;
     }
   },
+  boolean: (data, schema, result) => {
+    if (!(getType(data) === "boolean")) {
+      return `expected ${schema.type}, got ${getType(data)}`;
+    }
+  },
 };
 
 function validatePrimitiveType(ctx, result, schema, data) {
@@ -132,7 +137,7 @@ function validateElements(ctx, result, schema, data) {
 }
 
 function isMap(x) {
-  return x.constructor == {}.constructor;
+  return x?.constructor == {}.constructor;
 }
 
 // array and type should work together
@@ -226,12 +231,44 @@ function validateSchemasArray(ctx, result, schemas, data) {
 //     else
 //        validate(el-schs, v)
 
+function checkOnlyOneChoisePresent(metChoices, choiceOf, elementKey, result) {
+  if (metChoices[choiceOf]) {
+    addError(
+      result,
+      "choice",
+      `only one choice for '${choiceOf}' allowed, but multiple found: ${elementKey}, ${metChoices[choiceOf]}`,
+    );
+  }
+  metChoices[choiceOf] = elementKey;
+}
+
+function checkChoiceIsIncludedInChoiceList(metChoices, schema, result) {
+  each(metChoices, (choiceOf, exactChoice) => {
+    const els = schema?.elements;
+    if (!els) {
+      return;
+    }
+    const allowedChoices = els[choiceOf];
+    if (allowedChoices) {
+      if (!allowedChoices.choices.includes(exactChoice)) {
+        addError(
+          result,
+          "choice",
+          `only one of the choices from the list '${JSON.stringify(allowedChoices.choices)}' is allowed, but '${exactChoice}' was found`,
+        );
+      }
+    }
+  });
+}
+
 function validateSchemas(ctx, result, schemas, data) {
   each(schemas, (schk, sch) => {
     VALIDATORS(sch).forEach((validator) => validator(ctx, result, sch, data));
   });
 
   if (isMap(data)) {
+    const meetChoices = {}; // ;; kv "choiceOf" -> choice
+
     each(data, (k, v) => {
       if (result.root && k == "resourceType") {
         result.root = false;
@@ -240,11 +277,22 @@ function validateSchemas(ctx, result, schemas, data) {
         result.path.push(k);
         each(schemas, (schk, sch) => {
           let subsch = (sch?.elements || {})[k];
+
           if (subsch) {
             subsch.name = sch.url + "." + k;
             addSchemaToSet(ctx, elset, subsch);
+
+            const choiceOf = subsch.choiceOf;
+            if (!!choiceOf) {
+              checkOnlyOneChoisePresent(meetChoices, choiceOf, k, result);
+            }
           }
         });
+
+        each(schemas, (_, schema) => {
+          checkChoiceIsIncludedInChoiceList(meetChoices, schema, result);
+        });
+
         if (Object.keys(elset).length === 0) {
           addError(result, "unknown-element", `${k} is unknown`);
         } else {
@@ -267,7 +315,7 @@ function validateSchemas(ctx, result, schemas, data) {
 
 export function validate(ctx, schemaNames, data) {
   let schset = set();
-  let result = { root: true, errors: [], path: [data.resourceType] };
+  let result = { root: true, errors: [], path: [data?.resourceType] };
   schemaNames.forEach((x) => {
     addSchemaToSet(ctx, schset, resolveSchema(ctx, x));
   });
