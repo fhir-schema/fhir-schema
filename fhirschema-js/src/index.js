@@ -244,11 +244,7 @@ function checkOnlyOneChoisePresent(metChoices, choiceOf, elementKey, result) {
 
 function checkChoiceIsIncludedInChoiceList(metChoices, schema, result) {
   each(metChoices, (choiceOf, exactChoice) => {
-    const els = schema?.elements;
-    if (!els) {
-      return;
-    }
-    const allowedChoices = els[choiceOf];
+    const allowedChoices = schema?.elements?.[choiceOf];
     if (allowedChoices) {
       if (!allowedChoices.choices.includes(exactChoice)) {
         addError(
