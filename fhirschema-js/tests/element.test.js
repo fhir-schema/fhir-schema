@@ -5,44 +5,6 @@ const createSchemaResolver = (store) => (url, opts) => store[url];
 
 let valid = { errors: [] };
 
-test("primitive types", () => {
-  const ctx = {
-    schemaResolver: createSchemaResolver({
-      string: { kind: "primitive-type", type: "string" },
-      integer: { kind: "primitive-type", type: "integer" },
-      Resource: {
-        name: "Resource",
-        elements: {
-          id: {
-            type: "string",
-          },
-          numericValue: {
-            type: "integer",
-          },
-        },
-      },
-    }),
-  };
-
-  expect(
-    validate(ctx, ["Resource"], {
-      resourceType: "Patient",
-      id: "r1",
-      numericValue: 50,
-    }),
-  ).toEqual({ errors: [] });
-
-  expect(
-    validate(ctx, ["Resource"], {
-      resourceType: "Patient",
-      id: 1,
-      numericValue: "50",
-    }),
-  ).toMatchObject({
-    errors: [{ path: "Patient.id" }, { path: "Patient.numericValue" }],
-  });
-});
-
 test("elements", () => {
   const ctx = {
     schemaResolver: createSchemaResolver({

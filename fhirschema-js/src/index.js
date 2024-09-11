@@ -56,7 +56,6 @@ function validatePrimitiveType(ctx, result, schema, data) {
   );
 
   const err = primitiveValidator(data, schema);
-  console.log("ERROR: ", err);
 
   if (err) {
     addError(result, "type", err);
