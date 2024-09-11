@@ -8,6 +8,13 @@ function addError(result, type, message) {
   });
 }
 
+function formatValue(v) {
+  if (Array.isArray(v)) {
+    return `[${v.map((v) => `'${v}'`).join(", ")}]`;
+  }
+  return `'${v}'`;
+}
+
 function getType(input) {
   const type = Object.prototype.toString.call(input);
   switch (type) {
@@ -231,26 +238,30 @@ function validateSchemasArray(ctx, result, schemas, data) {
 //     else
 //        validate(el-schs, v)
 
-function checkOnlyOneChoisePresent(metChoices, choiceOf, elementKey, result) {
+function checkOnlyOneChoicePresent(metChoices, choiceOf, elementKey, result) {
   if (metChoices[choiceOf]) {
     addError(
       result,
       "choice",
-      `only one choice for '${choiceOf}' allowed, but multiple found: ${elementKey}, ${metChoices[choiceOf]}`,
+      `only one choice for ${formatValue(choiceOf)} allowed, but multiple found: ${formatValue([elementKey, ...metChoices[choiceOf]])}`,
     );
   }
-  metChoices[choiceOf] = elementKey;
 }
 
+// let intersection = arrA.filter((x) => arrB.includes(x));
+
 function checkChoiceIsIncludedInChoiceList(metChoices, schema, result) {
-  each(metChoices, (choiceOf, exactChoice) => {
+  each(metChoices, (choiceOf, exactChoices) => {
     const allowedChoices = schema?.elements?.[choiceOf];
-    if (allowedChoices) {
-      if (!allowedChoices.choices.includes(exactChoice)) {
+    if (!!allowedChoices) {
+      const notAlowedChoicePresent = exactChoices.some(
+        (exactChoice) => !allowedChoices.choices.includes(exactChoice),
+      );
+      if (notAlowedChoicePresent) {
         addError(
           result,
           "choice",
-          `only one of the choices from the list '${JSON.stringify(allowedChoices.choices)}' is allowed, but '${exactChoice}' was found`,
+          `only one of the choices from the list ${formatValue(allowedChoices.choices)} is allowed, but ${formatValue(exactChoices)} was found`,
         );
       }
     }
@@ -263,7 +274,7 @@ function validateSchemas(ctx, result, schemas, data) {
   });
 
   if (isMap(data)) {
-    const meetChoices = {}; // ;; kv "choiceOf" -> choice
+    const metChoices = {}; // ;; kv "choiceOf" -> choice, candidate for NODE CTX or smth?
 
     each(data, (k, v) => {
       if (result.root && k == "resourceType") {
@@ -272,21 +283,23 @@ function validateSchemas(ctx, result, schemas, data) {
         let elset = set();
         result.path.push(k);
         each(schemas, (schk, sch) => {
-          let subsch = (sch?.elements || {})[k];
+          let subsch = sch?.elements?.[k];
 
           if (subsch) {
-            subsch.name = sch.url + "." + k;
+            subsch.name = sch.name + "." + k; // TODO FIXME
             addSchemaToSet(ctx, elset, subsch);
 
             const choiceOf = subsch.choiceOf;
             if (!!choiceOf) {
-              checkOnlyOneChoisePresent(meetChoices, choiceOf, k, result);
+              checkOnlyOneChoicePresent(metChoices, choiceOf, k, result);
+              metChoices[choiceOf] = [...(metChoices[choiceOf] || []), k];
             }
           }
         });
 
+        // post schemas spin validations
         each(schemas, (_, schema) => {
-          checkChoiceIsIncludedInChoiceList(meetChoices, schema, result);
+          checkChoiceIsIncludedInChoiceList(metChoices, schema, result);
         });
 
         if (Object.keys(elset).length === 0) {
