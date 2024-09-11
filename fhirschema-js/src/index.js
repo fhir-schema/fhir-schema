@@ -1,18 +1,14 @@
 const fhirpath = require("fhirpath");
 
-function addError(result, type, message) {
-  result.errors.push({
-    type: type,
-    path: result.path.join("."),
-    message: message,
-  });
-}
-
 function formatValue(v) {
   if (Array.isArray(v)) {
     return `[${v.map((v) => `'${v}'`).join(", ")}]`;
   }
   return `'${v}'`;
+}
+
+function isMap(x) {
+  return x?.constructor == {}.constructor;
 }
 
 function getType(input) {
@@ -41,6 +37,20 @@ function getType(input) {
 
 function isPrimitive(tp) {
   return tp.toLowerCase() === tp;
+}
+
+function addError(result, type, message) {
+  let err = {
+    type: type,
+    path: result.path.join("."),
+  };
+  if (isMap(message)) {
+    err = { ...err, ...message };
+  } else {
+    err.message = message;
+  }
+
+  result.errors.push(err);
 }
 
 const fhirPrimitiveTypeValidators = {
@@ -143,14 +153,38 @@ function validateElements(ctx, result, schema, data) {
   }
 }
 
-function isMap(x) {
-  return x?.constructor == {}.constructor;
+function validateConstraints(ctx, result, schema, data) {
+  each(schema.constraints, (constraintId, { expression, severity, human }) => {
+    if (severity === "error") {
+      const evalResult = fhirpath.evaluate(
+        data,
+        expression,
+        {},
+        ctx.fhirpathModel,
+      );
+      console.assert(
+        evalResult.length === 1,
+        `Validation engine awaits only one evaluation result, but FHIRPath expression ${formatValue(expression)} returned ${formatValue(result)}`,
+      );
+      console.assert(
+        getType(evalResult[0]) === "boolean",
+        `Expected boolean as a result of evaluation ${formatValue(expression)}, but got ${formatValue(result)}`,
+      );
+      if (!evalResult[0]) {
+        addError(result, "fhirpath-constraint", {
+          message: `FHIRPath constraint ${constraintId} error: ${human || 'property "human" is not provided'}`,
+          constraint: constraintId,
+        });
+      }
+    }
+  });
 }
 
 // array and type should work together
 
 let VALIDATORS = (sc) =>
   [
+    [(sc) => "constraints" in sc, validateConstraints],
     [(sc) => "required" in sc, validateRequired],
     [(sc) => "excluded" in sc, validateExcluded],
     [(sc) => sc.kind === "primitive-type", validatePrimitiveType],
@@ -248,8 +282,6 @@ function checkOnlyOneChoicePresent(metChoices, choiceOf, elementKey, result) {
   }
 }
 
-// let intersection = arrA.filter((x) => arrB.includes(x));
-
 function checkChoiceIsIncludedInChoiceList(metChoices, schema, result) {
   each(metChoices, (choiceOf, exactChoices) => {
     const allowedChoices = schema?.elements?.[choiceOf];
@@ -331,31 +363,3 @@ export function validate(ctx, schemaNames, data) {
   validateSchemas(ctx, result, schset, data);
   return { errors: result.errors };
 }
-
-let ctx = {
-  resource: {
-    required: ["id"],
-    elements: { id: { type: "string" } },
-  },
-  HumanName: {
-    elements: {
-      family: { type: "string" },
-      given: { type: "string", array: true },
-    },
-  },
-  patient: {
-    base: "resource",
-    required: ["birthDate"],
-    elements: {
-      name: { array: true, type: "HumanName" },
-    },
-  },
-  string: {},
-  "us-patient": {
-    base: "patient",
-    require: ["name"],
-    elements: { name: { min: 1 } },
-  },
-};
-
-// console.log(validate(ctx, ['patient'], {id: 'pt1', name: [{family: 'ryz', given: [1], extra: 'ups'}, 1], ups: 'ups'}))
