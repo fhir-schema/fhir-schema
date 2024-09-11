@@ -67,8 +67,23 @@ function validateRequired(ctx, result, schema, data) {
   if (tp == "object") {
     schema.required.forEach((k) => {
       result.path.push(k);
-      if (data[k] === undefined) {
+      if (!(k in data)) {
         addError(result, "required", `${k} is required`);
+      }
+      result.path.pop();
+    });
+  } else {
+    addError(result, "type", `expected object got ${tp}`);
+  }
+}
+
+function validateExcluded(ctx, result, schema, data) {
+  let tp = getType(data);
+  if (tp == "object") {
+    schema.excluded.forEach((k) => {
+      result.path.push(k);
+      if (k in data) {
+        addError(result, "excluded", `excluded property ${k} is present`);
       }
       result.path.pop();
     });
@@ -125,6 +140,7 @@ function isMap(x) {
 let VALIDATORS = (sc) =>
   [
     [(sc) => "required" in sc, validateRequired],
+    [(sc) => "excluded" in sc, validateExcluded],
     [(sc) => sc.kind === "primitive-type", validatePrimitiveType],
     [(sc) => "elements" in sc, validateElements],
   ]
