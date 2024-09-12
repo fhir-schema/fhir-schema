@@ -59,6 +59,11 @@ const fhirPrimitiveTypeValidators = {
       return `expected ${schema.type}, got ${getType(data)}`;
     }
   },
+  url: (data, schema) => {
+    if (!(getType(data) === "string")) {
+      return `expected ${schema.type}, got ${getType(data)}`;
+    }
+  },
   boolean: (data, schema) => {
     if (!(getType(data) === "boolean")) {
       return `expected ${schema.type}, got ${getType(data)}`;
@@ -204,6 +209,17 @@ function resolveSchema(ctx, schemaName) {
   }
 }
 
+function resolveSchemaFromUrl(ctx, schemaName, path) {
+  let sch = ctx.schemaResolver(schemaName);
+  if (sch) {
+    return sch;
+  } else {
+    throw new Error(
+      `could not resolve ${formatValue(schemaName)} from ${formatValue([...path, "url"])}`,
+    );
+  }
+}
+
 function set() {
   return {};
 }
@@ -215,15 +231,19 @@ function each(obj, f) {
   }
 }
 
-function addSchemaToSet(ctx, set, schema) {
+function isReferenceOnExtension(ref) {
+  return ref === "Extension";
+}
+
+function addSchemasToSet(ctx, set, schema) {
   if (schema) {
     if (schema.base && !set[schema.base]) {
-      addSchemaToSet(ctx, set, resolveSchema(ctx, schema.base));
+      addSchemasToSet(ctx, set, resolveSchema(ctx, schema.base));
     }
     if (schema.type && !set[schema.type] && schema.kind !== "primitive-type") {
-      let tp = resolveSchema(ctx, schema.type);
-      if (tp) {
-        addSchemaToSet(ctx, set, tp);
+      const resolvedTypeSchema = resolveSchema(ctx, schema.type);
+      if (resolvedTypeSchema) {
+        addSchemasToSet(ctx, set, resolvedTypeSchema);
       }
     }
     set[schema.name] = schema;
@@ -302,7 +322,8 @@ function validateSchemas(ctx, result, schemas, data) {
   });
 
   if (isMap(data)) {
-    const metChoices = {}; // ;; kv "choiceOf" -> choice, candidate for NODE CTX or smth?
+    const metChoices = {};
+    let dataIsExtension = false;
 
     each(data, (k, v) => {
       if (result.root && k === "resourceType") {
@@ -315,7 +336,11 @@ function validateSchemas(ctx, result, schemas, data) {
 
           if (subsch) {
             subsch.name = sch.name + "." + k; // TODO FIXME
-            addSchemaToSet(ctx, elset, subsch);
+            addSchemasToSet(ctx, elset, subsch);
+
+            if (isReferenceOnExtension(subsch.type)) {
+              dataIsExtension = true;
+            }
 
             const choiceOf = subsch.choiceOf;
             if (choiceOf) {
@@ -337,10 +362,24 @@ function validateSchemas(ctx, result, schemas, data) {
             validateSchemasArray(ctx, result, elset, v);
             v.forEach((x, i) => {
               result.path.push(i);
+              if (dataIsExtension) {
+                addSchemasToSet(
+                  ctx,
+                  elset,
+                  resolveSchemaFromUrl(ctx, x.url, result.path),
+                );
+              }
               validateSchemas(ctx, result, elset, x);
               result.path.pop();
             });
           } else {
+            if (dataIsExtension) {
+              addSchemasToSet(
+                ctx,
+                elset,
+                resolveSchemaFromUrl(ctx, v.url, result.path),
+              );
+            }
             validateSchemas(ctx, result, elset, v);
           }
         }
@@ -354,7 +393,7 @@ export function validate(ctx, schemaNames, data) {
   let schset = set();
   let result = { root: true, errors: [], path: [data?.resourceType] };
   schemaNames.forEach((x) => {
-    addSchemaToSet(ctx, schset, resolveSchema(ctx, x));
+    addSchemasToSet(ctx, schset, resolveSchema(ctx, x));
   });
   validateSchemas(ctx, result, schset, data);
   return { errors: result.errors };

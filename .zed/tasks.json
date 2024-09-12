@@ -5,8 +5,21 @@
   {
     "label": "bun test \"$ZED_SYMBOL\"",
     "command": "bun test",
-    "args": ["$ZED_FILE --test-name-pattern \"$ZED_SYMBOL\" "],
-    "tags": ["ts-test", "js-test"],
-    "hide": "on_success"
+    "args": ["$ZED_FILE --test-name-pattern '$ZED_SYMBOL'"],
+    "tags": ["ts-test", "js-test"]
+    // "hide": "on_success"
+  },
+  {
+    "label": "bun test file \"$ZED_FILE\"",
+    "command": "bun test",
+    "args": ["$ZED_FILE"],
+    "tags": ["ts-test", "js-test"]
+    // "hide": "on_success"
+  },
+  {
+    "label": "bun test all",
+    "command": "bun test",
+    "tags": ["ts-test", "js-test"]
+    // "hide": "on_success"
   }
 ]
