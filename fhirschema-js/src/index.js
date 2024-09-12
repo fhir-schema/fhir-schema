@@ -260,6 +260,10 @@ function isReferenceOnExtension(ref) {
   return ref === "Extension";
 }
 
+function isReferenceOnResource(ref) {
+  return ref === "Resource";
+}
+
 function addSchemasToSet(ctx, set, schema) {
   if (schema) {
     if (schema.base && !set[schema.base]) {
@@ -349,6 +353,7 @@ function validateSchemas(ctx, result, schemas, data) {
   if (isMap(data)) {
     const metChoices = {};
     let dataIsExtension = false;
+    let dataIsNestedResource = false;
 
     each(data, (k, v) => {
       if (result.root && k === "resourceType") {
@@ -365,6 +370,10 @@ function validateSchemas(ctx, result, schemas, data) {
 
             if (isReferenceOnExtension(subsch.type)) {
               dataIsExtension = true;
+            }
+
+            if (isReferenceOnResource(subsch.type)) {
+              dataIsNestedResource = true;
             }
 
             const choiceOf = subsch.choiceOf;
@@ -394,16 +403,33 @@ function validateSchemas(ctx, result, schemas, data) {
                   resolveSchemaFromUrl(ctx, x.url, result.path),
                 );
               }
+              if (dataIsNestedResource) {
+                addSchemasToSet(
+                  ctx,
+                  elset,
+                  resolveSchemaFromUrl(ctx, x.resourceType, result.path),
+                );
+                result.root = true;
+              }
               validateSchemas(ctx, result, elset, x);
               result.path.pop();
             });
           } else {
             if (dataIsExtension) {
+              // TODO FIXME WE NEED TO FOLD THAT INTO SOME FUNCTION? SMELLS
               addSchemasToSet(
                 ctx,
                 elset,
                 resolveSchemaFromUrl(ctx, v.url, result.path),
               );
+            }
+            if (dataIsNestedResource) {
+              addSchemasToSet(
+                ctx,
+                elset,
+                resolveSchemaFromUrl(ctx, v.resourceType, result.path),
+              );
+              result.root = true;
             }
             validateSchemas(ctx, result, elset, v);
           }
