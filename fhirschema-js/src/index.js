@@ -1,14 +1,17 @@
 import fhirpath from "fhirpath";
+import _ from "lodash";
+
+function isMap(x) {
+  return x?.constructor === {}.constructor;
+}
 
 function formatValue(v) {
   if (Array.isArray(v)) {
     return `[${v.map((v) => `'${v}'`).join(", ")}]`;
+  } else if (isMap(v)) {
+    return `'${JSON.stringify(v)}'`;
   }
   return `'${v}'`;
-}
-
-function isMap(x) {
-  return x?.constructor === {}.constructor;
 }
 
 function getType(input) {
@@ -181,10 +184,32 @@ function validateConstraints(ctx, result, schema, data) {
   });
 }
 
-// array and type should work together
+function validateFixed(ctx, result, schema, data) {
+  const fixedValue = schema.fixed;
+  if (!_.isEqual(data, fixedValue)) {
+    addError(
+      result,
+      "fixed-value",
+      `Expected value to be exactly equal to 'fixed' pattern ${formatValue(fixedValue)}, but got: ${formatValue(data)}`,
+    );
+  }
+}
+
+function validatePattern(ctx, result, schema, data) {
+  const patternValue = schema.pattern;
+  if (!_.isMatch(data, patternValue)) {
+    addError(
+      result,
+      "pattern-value",
+      `Expected value to match 'pattern' ${formatValue(patternValue)}, but got: ${formatValue(data)}`,
+    );
+  }
+}
 
 let VALIDATORS = (sc) =>
   [
+    [(sc) => "fixed" in sc, validateFixed],
+    [(sc) => "pattern" in sc, validatePattern],
     [(sc) => "constraints" in sc, validateConstraints],
     [(sc) => "required" in sc, validateRequired],
     [(sc) => "excluded" in sc, validateExcluded],
