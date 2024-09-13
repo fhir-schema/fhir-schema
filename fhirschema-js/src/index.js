@@ -1,5 +1,6 @@
 import fhirpath from "fhirpath";
 import _ from "lodash";
+import syncRequest from "sync-request";
 
 function isMap(x) {
   return x?.constructor === {}.constructor;
@@ -63,6 +64,11 @@ const fhirPrimitiveTypeValidators = {
     }
   },
   url: (data, schema) => {
+    if (!(getType(data) === "string")) {
+      return `expected ${schema.type}, got ${getType(data)}`;
+    }
+  },
+  code: (data, schema) => {
     if (!(getType(data) === "string")) {
       return `expected ${schema.type}, got ${getType(data)}`;
     }
@@ -206,6 +212,75 @@ function validatePattern(ctx, result, schema, data) {
   }
 }
 
+const inferCodedValueDataType = (data) => {
+  if (getType(data) === "string") {
+    return "code";
+  } else if (getType(data) === "object" && !data.coding && !data.text) {
+    return "Coding";
+  } else if ((getType(data) === "object" && data.coding) || data.text) {
+    return "CodeableConcept";
+  }
+};
+
+const buildTerminologyValidationRequestPayload = (
+  binding,
+  codedValueType,
+  data,
+) => {
+  if (codedValueType === "code") {
+    return {
+      resourceType: "Parameters",
+      parameter: [
+        { name: "url", valueUri: binding.valueSet },
+        { name: "inferSystem", valueBoolean: true },
+        { name: "code", valueCode: data },
+      ],
+    };
+  }
+  if (codedValueType === "Coding") {
+    return {
+      resourceType: "Parameters",
+      parameter: [
+        { name: "url", valueUri: binding.valueSet },
+        { name: "coding", valueCoding: data },
+      ],
+    };
+  }
+  if (codedValueType === "CodeableConcept") {
+    return {
+      resourceType: "Parameters",
+      parameter: [
+        { name: "url", valueUri: binding.valueSet },
+        { name: "codeableConcept", valueCodeableConcept: data },
+      ],
+    };
+  }
+};
+
+function validateBinding(ctx, result, schema, data) {
+  const binding = schema.binding;
+  const dataType = schema.type || inferCodedValueDataType(data);
+  const response = syncRequest.request("POST", ctx.termServerUrl, {
+    json: buildTerminologyValidationRequestPayload(binding, dataType, data),
+  });
+
+  const responseParameters = JSON.parse(response.getBody("utf-8"));
+
+  if (
+    responseParameters?.parameter.find((param) => param.name === "result")
+      .valueBoolean
+  ) {
+    addError(result, "terminology-binding", {
+      binding: binding,
+      message: `Provided coded value ${formatValue(data)} does not pass validation against the following valueset: ${formatValue(binding.valueSet)}`,
+    });
+  }
+}
+
+function validateBindingSync(ctx, result, schema, data) {
+  validateBinding(ctx, result, schema, data).finally(console.error);
+}
+
 let VALIDATORS = (sc) =>
   [
     [(sc) => "fixed" in sc, validateFixed],
@@ -213,6 +288,7 @@ let VALIDATORS = (sc) =>
     [(sc) => "constraints" in sc, validateConstraints],
     [(sc) => "required" in sc, validateRequired],
     [(sc) => "excluded" in sc, validateExcluded],
+    [(sc) => "binding" in sc, validateBindingSync],
     [(sc) => sc.kind === "primitive-type", validatePrimitiveType],
     [(sc) => "elements" in sc, validateElements],
   ]
