@@ -1,6 +1,5 @@
 import fhirpath from "fhirpath";
 import _ from "lodash";
-import syncRequest from "sync-request";
 
 function isMap(x) {
   return x?.constructor === {}.constructor;
@@ -260,25 +259,19 @@ const buildTerminologyValidationRequestPayload = (
 function validateBinding(ctx, result, schema, data) {
   const binding = schema.binding;
   const dataType = schema.type || inferCodedValueDataType(data);
-  const response = syncRequest.request("POST", ctx.termServerUrl, {
-    json: buildTerminologyValidationRequestPayload(binding, dataType, data),
-  });
 
-  const responseParameters = JSON.parse(response.getBody("utf-8"));
-
-  if (
-    responseParameters?.parameter.find((param) => param.name === "result")
-      .valueBoolean
-  ) {
+  const responseParameters = ctx.terminiologyResolver(
+    buildTerminologyValidationRequestPayload(binding, dataType, data),
+  );
+  const isValid = responseParameters?.parameter.find(
+    (param) => param.name === "result",
+  ).valueBoolean;
+  if (!isValid) {
     addError(result, "terminology-binding", {
       binding: binding,
       message: `Provided coded value ${formatValue(data)} does not pass validation against the following valueset: ${formatValue(binding.valueSet)}`,
     });
   }
-}
-
-function validateBindingSync(ctx, result, schema, data) {
-  validateBinding(ctx, result, schema, data).finally(console.error);
 }
 
 let VALIDATORS = (sc) =>
@@ -288,7 +281,7 @@ let VALIDATORS = (sc) =>
     [(sc) => "constraints" in sc, validateConstraints],
     [(sc) => "required" in sc, validateRequired],
     [(sc) => "excluded" in sc, validateExcluded],
-    [(sc) => "binding" in sc, validateBindingSync],
+    [(sc) => "binding" in sc, validateBinding],
     [(sc) => sc.kind === "primitive-type", validatePrimitiveType],
     [(sc) => "elements" in sc, validateElements],
   ]

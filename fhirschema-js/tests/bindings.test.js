@@ -5,7 +5,15 @@ const createSchemaResolver = (store) => (url, _opts) => store[url];
 
 describe("fhirpath constraints", () => {
   const ctx = {
-    termServerUrl: "https://tx.fhir.org/r4/ValueSet/$validate-code",
+    terminiologyResolver: (r) => {
+      const code = r.parameter.find((param) => param.name === "code").valueCode;
+      switch (code) {
+        case "male":
+          return { parameter: [{ name: "result", valueBoolean: true }] };
+        default:
+          return { parameter: [{ name: "result", valueBoolean: false }] };
+      }
+    },
     schemaResolver: createSchemaResolver({
       code: { type: "code", kind: "primitive-type" },
       ResourceA: {
@@ -38,6 +46,19 @@ describe("fhirpath constraints", () => {
         resourceType: "ResourceA",
         gender: "animallll",
       }),
-    ).toEqual({ errors: [{}] });
+    ).toEqual({
+      errors: [
+        {
+          binding: {
+            strength: "required",
+            valueSet: "http://hl7.org/fhir/administrative-gender",
+          },
+          message:
+            "Provided coded value 'animallll' does not pass validation against the following valueset: 'http://hl7.org/fhir/administrative-gender'",
+          path: "ResourceA.gender",
+          type: "terminology-binding",
+        },
+      ],
+    });
   });
 });
