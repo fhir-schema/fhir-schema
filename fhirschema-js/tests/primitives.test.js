@@ -15,10 +15,12 @@ describe("primitive types", () => {
       { type: "boolean", value: true },
       { type: "boolean", value: false },
     ].forEach(({ type, value }) => {
-      test(`Should be valid for ${type} with value ${value}`, () => {
+      test(`Should be valid for ${type} with value ${value}`, async () => {
         const ctx = {};
         ctx[type] = { kind: "primitive-type", type };
-        expect(validate(crCtx(ctx), [type], value)).toEqual({ errors: [] });
+        expect(validate(crCtx(ctx), [type], value)).resolves.toEqual({
+          errors: [],
+        });
       });
     });
   });
@@ -71,10 +73,10 @@ describe("primitive types", () => {
         },
       },
     ].forEach(({ type, value, error }) => {
-      test(`Should fail for ${type} with value ${value}`, () => {
+      test(`Should fail for ${type} with value ${value}`, async () => {
         const ctx = {};
         ctx[type] = { kind: "primitive-type", type };
-        expect(validate(crCtx(ctx), [type], value)).toEqual({
+        expect(validate(crCtx(ctx), [type], value)).resolves.toEqual({
           errors: [error],
         });
       });
@@ -82,7 +84,7 @@ describe("primitive types", () => {
   });
 });
 
-test("Primitive types as part of different schemas", () => {
+test("Primitive types as part of different schemas", async () => {
   const ctx = {
     schemaResolver: createSchemaResolver({
       string: { kind: "primitive-type", type: "string" },
@@ -107,7 +109,7 @@ test("Primitive types as part of different schemas", () => {
       id: "r1",
       numericValue: 50,
     }),
-  ).toEqual({ errors: [] });
+  ).resolves.toEqual({ errors: [] });
 
   expect(
     validate(ctx, ["Resource"], {
@@ -115,7 +117,7 @@ test("Primitive types as part of different schemas", () => {
       id: 1,
       numericValue: "50",
     }),
-  ).toMatchObject({
+  ).resolves.toMatchObject({
     errors: [{ path: "Patient.id" }, { path: "Patient.numericValue" }],
   });
 });

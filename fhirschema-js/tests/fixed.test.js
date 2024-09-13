@@ -33,24 +33,24 @@ describe("The `fixed` directive functions as a constant declaration and requires
   };
 
   describe("positive cases", () => {
-    test("data contains valid name equals to `fixed` value", () => {
+    test("data contains valid name equals to `fixed` value", async () => {
       expect(
         validate(ctx, ["PatientProfile"], {
           resourceType: "Patient",
           name: [{ given: ["M", "Ger"], family: "Jovan" }],
         }),
-      ).toEqual({ errors: [] });
+      ).resolves.toEqual({ errors: [] });
     });
   });
 
   describe("negative cases", () => {
-    test("data contains name with additional givens", () => {
+    test("data contains name with additional givens", async () => {
       expect(
         validate(ctx, ["PatientProfile"], {
           resourceType: "Patient",
           name: [{ given: ["M", "Ger", "Q"], family: "Jovan" }],
         }),
-      ).toEqual({
+      ).resolves.toEqual({
         errors: [
           {
             message:

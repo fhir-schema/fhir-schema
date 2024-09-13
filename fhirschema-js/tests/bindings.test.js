@@ -14,7 +14,7 @@ describe("fhirpath constraints", () => {
           gender: {
             type: "code",
             binding: {
-              valueSet: "http://hl7.org/fhir/administrative-gender",
+              valueSet: "http://hl7.org/fhir/ValueSet/administrative-gender",
               strength: "required",
             },
           },
@@ -23,21 +23,34 @@ describe("fhirpath constraints", () => {
     }),
   };
 
-  test("positive case, code", () => {
-    expect(
+  test("positive case, code", async () => {
+    await expect(
       validate(ctx, ["ResourceA"], {
         resourceType: "ResourceA",
         gender: "male",
       }),
-    ).toEqual({ errors: [] });
+    ).resolves.toEqual({ errors: [] });
   });
 
-  test("negative case, code", () => {
-    expect(
+  test("negative case, code", async () => {
+    await expect(
       validate(ctx, ["ResourceA"], {
         resourceType: "ResourceA",
         gender: "animallll",
       }),
-    ).toEqual({ errors: [{}] });
+    ).resolves.toEqual({
+      errors: [
+        {
+          binding: {
+            strength: "required",
+            valueSet: "http://hl7.org/fhir/ValueSet/administrative-gender",
+          },
+          message:
+            "Provided coded value 'animallll' does not pass validation against the following valueset: 'http://hl7.org/fhir/ValueSet/administrative-gender'",
+          path: "ResourceA.gender",
+          type: "terminology-binding",
+        },
+      ],
+    });
   });
 });

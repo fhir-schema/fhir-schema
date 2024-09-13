@@ -33,33 +33,33 @@ describe("The `pattern` directive requires data to have at least the specified p
   };
 
   describe("positive cases", () => {
-    test("data contains valid name matching the `pattern`", () => {
+    test("data contains valid name matching the `pattern`", async () => {
       expect(
         validate(ctx, ["PatientProfile"], {
           resourceType: "Patient",
           name: [{ given: ["John"], family: "Doe" }],
         }),
-      ).toEqual({ errors: [] });
+      ).resolves.toEqual({ errors: [] });
     });
 
-    test("data contains additional properties beyond the `pattern`", () => {
+    test("data contains additional properties beyond the `pattern`", async () => {
       expect(
         validate(ctx, ["PatientProfile"], {
           resourceType: "Patient",
           name: [{ given: ["John"], family: "Doe", prefix: ["Mr."] }],
         }),
-      ).toEqual({ errors: [] });
+      ).resolves.toEqual({ errors: [] });
     });
   });
 
   describe("negative cases", () => {
-    test("data is missing a required property from the `pattern`", () => {
+    test("data is missing a required property from the `pattern`", async () => {
       expect(
         validate(ctx, ["PatientProfile"], {
           resourceType: "Patient",
           name: [{ given: ["John"] }],
         }),
-      ).toEqual({
+      ).resolves.toEqual({
         errors: [
           {
             message:
@@ -71,13 +71,13 @@ describe("The `pattern` directive requires data to have at least the specified p
       });
     });
 
-    test("data has a different value for a property specified in the `pattern`", () => {
+    test("data has a different value for a property specified in the `pattern`", async () => {
       expect(
         validate(ctx, ["PatientProfile"], {
           resourceType: "Patient",
           name: [{ given: ["Jane"], family: "Doe" }],
         }),
-      ).toEqual({
+      ).resolves.toEqual({
         errors: [
           {
             message:

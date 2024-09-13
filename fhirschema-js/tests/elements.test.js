@@ -27,7 +27,7 @@ describe("Schema inheritance tests", () => {
       }),
     };
 
-    test("positive case, data uses valid types", () => {
+    test("positive case, data uses valid types", async () => {
       expect(
         validate(ctx, ["Patient"], {
           resourceType: "Patient",
@@ -35,10 +35,10 @@ describe("Schema inheritance tests", () => {
             given: ["John", "Doe"],
           },
         }),
-      ).toEqual(valid);
+      ).resolves.toEqual(valid);
     });
 
-    test("negative case, data violates type constraints", () => {
+    test("negative case, data violates type constraints", async () => {
       expect(
         validate(ctx, ["Patient"], {
           resourceType: "Patient",
@@ -46,7 +46,7 @@ describe("Schema inheritance tests", () => {
             given: 42,
           },
         }),
-      ).toMatchObject({
+      ).resolves.toMatchObject({
         errors: [{ message: "expected string, got number" }],
       });
     });
@@ -73,24 +73,24 @@ describe("Schema inheritance tests", () => {
       }),
     };
 
-    test("positive case, data uses only known and valid keys", () => {
+    test("positive case, data uses only known and valid keys", async () => {
       expect(
         validate(ctx, ["ResourceB"], {
           resourceType: "Patient",
           id: "id-from-schema-a",
           newProperty: "val",
         }),
-      ).toEqual(valid);
+      ).resolves.toEqual(valid);
     });
 
-    test("negative case, data violates data types from both resourceA and B", () => {
+    test("negative case, data violates data types from both resourceA and B", async () => {
       expect(
         validate(ctx, ["ResourceB"], {
           resourceType: "Patient",
           id: 1,
           newProperty: 1,
         }),
-      ).toMatchObject({
+      ).resolves.toMatchObject({
         errors: [
           { message: "expected string, got number" },
           { message: "expected string, got number" },
@@ -100,7 +100,7 @@ describe("Schema inheritance tests", () => {
   });
 });
 
-test("elements", () => {
+test("elements", async () => {
   const ctx = {
     schemaResolver: createSchemaResolver({
       string: { type: "string", kind: "primitive-type" },
@@ -117,11 +117,11 @@ test("elements", () => {
 
   expect(
     validate(ctx, ["Resource"], { resourceType: "Patient", id: "r1" }),
-  ).toEqual(valid);
+  ).resolves.toEqual(valid);
 
   expect(
     validate(ctx, ["Resource"], { resourceType: "Patient", id: 1 }),
-  ).toEqual({
+  ).resolves.toEqual({
     errors: [
       {
         message: "expected string, got number",
@@ -136,7 +136,7 @@ test("elements", () => {
       resourceType: "Patient",
       name: [{ family: "Smith" }],
     }),
-  ).toEqual({
+  ).resolves.toEqual({
     errors: [
       {
         message: "name is unknown",
@@ -146,5 +146,3 @@ test("elements", () => {
     ],
   });
 });
-
-// TODO: patient.name ^ us-core.name unknown-key text

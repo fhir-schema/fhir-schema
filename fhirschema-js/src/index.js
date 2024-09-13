@@ -1,6 +1,6 @@
 import fhirpath from "fhirpath";
 import _ from "lodash";
-import syncRequest from "sync-request";
+import axios from "axios";
 
 function isMap(x) {
   return x?.constructor === {}.constructor;
@@ -257,17 +257,16 @@ const buildTerminologyValidationRequestPayload = (
   }
 };
 
-function validateBinding(ctx, result, schema, data) {
+async function validateBinding(ctx, result, schema, data) {
   const binding = schema.binding;
   const dataType = schema.type || inferCodedValueDataType(data);
-  const response = syncRequest.request("POST", ctx.termServerUrl, {
-    json: buildTerminologyValidationRequestPayload(binding, dataType, data),
-  });
 
-  const responseParameters = JSON.parse(response.getBody("utf-8"));
-
+  const response = await axios.post(
+    ctx.termServerUrl,
+    buildTerminologyValidationRequestPayload(binding, dataType, data),
+  );
   if (
-    responseParameters?.parameter.find((param) => param.name === "result")
+    !response?.data?.parameter?.find((param) => param.name === "result")
       .valueBoolean
   ) {
     addError(result, "terminology-binding", {
@@ -277,10 +276,6 @@ function validateBinding(ctx, result, schema, data) {
   }
 }
 
-function validateBindingSync(ctx, result, schema, data) {
-  validateBinding(ctx, result, schema, data).finally(console.error);
-}
-
 let VALIDATORS = (sc) =>
   [
     [(sc) => "fixed" in sc, validateFixed],
@@ -288,7 +283,7 @@ let VALIDATORS = (sc) =>
     [(sc) => "constraints" in sc, validateConstraints],
     [(sc) => "required" in sc, validateRequired],
     [(sc) => "excluded" in sc, validateExcluded],
-    [(sc) => "binding" in sc, validateBindingSync],
+    [(sc) => "binding" in sc, validateBinding],
     [(sc) => sc.kind === "primitive-type", validatePrimitiveType],
     [(sc) => "elements" in sc, validateElements],
   ]
@@ -329,6 +324,13 @@ function each(obj, f) {
   for (var k in obj) {
     var v = obj[k];
     f(k, v);
+  }
+}
+
+async function eachWait(obj, f) {
+  for (var k in obj) {
+    var v = obj[k];
+    await f(k, v);
   }
 }
 
@@ -421,9 +423,12 @@ function checkChoiceIsIncludedInChoiceList(metChoices, schema, result) {
   });
 }
 
-function validateSchemas(ctx, result, schemas, data) {
-  each(schemas, (schk, sch) => {
-    VALIDATORS(sch).forEach((validator) => validator(ctx, result, sch, data));
+async function validateSchemas(ctx, result, schemas, data) {
+  await eachWait(schemas, async (schk, sch) => {
+    const validators = VALIDATORS(sch).map(async (validator) => {
+      await validator(ctx, result, sch, data);
+    });
+    await Promise.all(validators);
   });
 
   if (isMap(data)) {
@@ -431,13 +436,13 @@ function validateSchemas(ctx, result, schemas, data) {
     let dataIsExtension = false;
     let dataIsNestedResource = false;
 
-    each(data, (k, v) => {
+    await eachWait(data, async (k, v) => {
       if (result.root && k === "resourceType") {
         result.root = false;
       } else {
         let elset = set();
         result.path.push(k);
-        each(schemas, (schk, sch) => {
+        each(schemas, async (schk, sch) => {
           let subsch = sch?.elements?.[k];
 
           if (subsch) {
@@ -470,8 +475,11 @@ function validateSchemas(ctx, result, schemas, data) {
         } else {
           if (Array.isArray(v)) {
             validateSchemasArray(ctx, result, elset, v);
-            v.forEach((x, i) => {
+
+            let i = 0;
+            for (const x of v) {
               result.path.push(i);
+              i += 1;
               if (dataIsExtension) {
                 addSchemasToSet(
                   ctx,
@@ -487,9 +495,9 @@ function validateSchemas(ctx, result, schemas, data) {
                 );
                 result.root = true;
               }
-              validateSchemas(ctx, result, elset, x);
+              await validateSchemas(ctx, result, elset, x);
               result.path.pop();
-            });
+            }
           } else {
             if (dataIsExtension) {
               // TODO FIXME WE NEED TO FOLD THAT INTO SOME FUNCTION? SMELLS
@@ -507,7 +515,7 @@ function validateSchemas(ctx, result, schemas, data) {
               );
               result.root = true;
             }
-            validateSchemas(ctx, result, elset, v);
+            await validateSchemas(ctx, result, elset, v);
           }
         }
         result.path.pop();
@@ -516,12 +524,12 @@ function validateSchemas(ctx, result, schemas, data) {
   }
 }
 
-export function validate(ctx, schemaNames, data) {
+export async function validate(ctx, schemaNames, data) {
   let schset = set();
   let result = { root: true, errors: [], path: [data?.resourceType] };
   schemaNames.forEach((x) => {
     addSchemasToSet(ctx, schset, resolveSchema(ctx, x));
   });
-  validateSchemas(ctx, result, schset, data);
+  await validateSchemas(ctx, result, schset, data);
   return { errors: result.errors };
 }
