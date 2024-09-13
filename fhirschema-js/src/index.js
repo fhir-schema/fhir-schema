@@ -307,11 +307,13 @@ function resolveSchemaFromUrl(ctx, schemaName, path) {
   let sch = ctx.schemaResolver(schemaName);
   if (sch) {
     return sch;
-  } else {
-    throw new Error(
-      `could not resolve ${formatValue(schemaName)} from ${formatValue([...path, "url"])}`,
-    );
   }
+  // NOTE: do not resolve url on the first level of extention ONLY
+  // else {
+  //   throw new Error(
+  //     `could not resolve ${formatValue(schemaName)} from ${formatValue([...path, "url"])}`,
+  //   );
+  // }
 }
 
 function set() {
@@ -357,6 +359,52 @@ function validateSchemasArray(ctx, result, schemas, data) {
       }
     });
   });
+}
+
+function validateSlices(ctx, result, schemas, data) {
+  Object.values(schemas)
+    .filter(({ slicing }) => !!slicing)
+    .forEach((schema) => {
+      const counters = {};
+
+      data.forEach((dataelm, i) => {
+        each(schema.slicing.slices, (sliceName, sliceDef) => {
+          if (_.isMatch(dataelm, sliceDef.match.value)) {
+            counters[sliceName] = (counters[sliceName] || 0) + 1;
+            if (sliceDef.schema) {
+              result.path.push(i);
+
+              const newSchemas = {};
+              Object.assign(newSchemas, schemas);
+              addSchemasToSet(ctx, newSchemas, sliceDef.schema);
+              validateSchemas(ctx, result, newSchemas, dataelm);
+              result.path.pop();
+            }
+          }
+        });
+      });
+
+      each(schema.slicing.slices, (sliceName, sliceDef) => {
+        const { min, max } = sliceDef;
+        const found = counters[sliceName] || 0;
+
+        if (min && found < min) {
+          addError(
+            result,
+            "slice-cardinality",
+            `Slice defines the following min cardinality: ${formatValue(min)}, actual cardinality: ${formatValue(found)}`,
+          );
+        }
+
+        if (max && found > max) {
+          addError(
+            result,
+            "slice-cardinality",
+            `Slice defines the following max cardinality: ${formatValue(max)}, actual cardinality: ${formatValue(found)}`,
+          );
+        }
+      });
+    });
 }
 
 // 1. shape validation (isObject/isArray/isPrimitive?)
@@ -463,6 +511,8 @@ function validateSchemas(ctx, result, schemas, data) {
         } else {
           if (Array.isArray(v)) {
             validateSchemasArray(ctx, result, elset, v);
+            validateSlices(ctx, result, elset, v);
+
             v.forEach((x, i) => {
               result.path.push(i);
               if (dataIsExtension) {
