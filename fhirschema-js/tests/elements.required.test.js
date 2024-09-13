@@ -18,16 +18,16 @@ describe("Required elements must be present in data", () => {
     }),
   };
 
-  test("positive case, required element is present", async () => {
+  test("positive case, required element is present", () => {
     expect(
       validate(ctx, ["Resource"], { resourceType: "Patient", a: "valueA" }),
-    ).resolves.toEqual({ errors: [] });
+    ).toEqual({ errors: [] });
   });
 
-  test("negative case, required element is missing", async () => {
+  test("negative case, required element is missing", () => {
     expect(
       validate(ctx, ["Resource"], { resourceType: "Patient", b: "valueB" }),
-    ).resolves.toEqual({
+    ).toEqual({
       errors: [
         { message: "a is required", path: "Patient.a", type: "required" },
       ],
@@ -58,20 +58,20 @@ describe("Required elements must be present in data", () => {
     }),
   };
 
-  test("positive case, required element is present", async () => {
+  test("positive case, required element is present", () => {
     expect(
       validate(ctx, ["Resource"], {
         resourceType: "Patient",
         a: "valueA",
         c: "valueC",
       }),
-    ).resolves.toEqual({ errors: [] });
+    ).toEqual({ errors: [] });
   });
 
-  test("negative case, required element is missing", async () => {
+  test("negative case, required element is missing", () => {
     expect(
       validate(ctx, ["Resource"], { resourceType: "Patient", b: "valueB" }),
-    ).resolves.toEqual({
+    ).toEqual({
       errors: [
         { message: "c is required", path: "Patient.c", type: "required" },
         { message: "a is required", path: "Patient.a", type: "required" },

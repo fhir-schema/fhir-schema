@@ -67,7 +67,7 @@ describe("If the extension type is met in the data, validate both the extension 
   };
 
   describe("positve cases", () => {
-    test("extesion defined by url is valid", async () => {
+    test("extesion defined by url is valid", () => {
       expect(
         validate(ctx, ["ResourceA"], {
           resourceType: "ResourceA",
@@ -76,10 +76,10 @@ describe("If the extension type is met in the data, validate both the extension 
             valueString: "my-value",
           },
         }),
-      ).resolves.toEqual({ errors: [] });
+      ).toEqual({ errors: [] });
     });
 
-    test("constraint on extension property declaration (not in extension itself)", async () => {
+    test("constraint on extension property declaration (not in extension itself)", () => {
       expect(
         validate(ctx, ["ResourceB"], {
           resourceType: "ResourceB",
@@ -88,14 +88,14 @@ describe("If the extension type is met in the data, validate both the extension 
             valueString: "m-val",
           },
         }),
-      ).resolves.toEqual({
+      ).toEqual({
         errors: [],
       });
     });
   });
 
   describe("negative cases", () => {
-    test("simple: extesion defined by url is validated and report an error", async () => {
+    test("simple: extesion defined by url is validated and report an error", () => {
       expect(
         validate(ctx, ["ResourceA"], {
           resourceType: "ResourceA",
@@ -104,7 +104,7 @@ describe("If the extension type is met in the data, validate both the extension 
             valueInteger: 4,
           },
         }),
-      ).resolves.toEqual({
+      ).toEqual({
         errors: [
           {
             message: "valueString is required",
@@ -121,7 +121,7 @@ describe("If the extension type is met in the data, validate both the extension 
       });
     });
 
-    test("2. extesion defined by url is validated and report an error (combined case for mistype and choice error)", async () => {
+    test("2. extesion defined by url is validated and report an error (combined case for mistype and choice error)", () => {
       expect(
         validate(ctx, ["ResourceA"], {
           resourceType: "ResourceA",
@@ -130,7 +130,7 @@ describe("If the extension type is met in the data, validate both the extension 
             valueInteger: "not-int",
           },
         }),
-      ).resolves.toEqual({
+      ).toEqual({
         errors: [
           {
             message: "valueString is required",
@@ -152,7 +152,7 @@ describe("If the extension type is met in the data, validate both the extension 
       });
     });
 
-    test("constraint on extension property declaration (not in extension itself)", async () => {
+    test("constraint on extension property declaration (not in extension itself)", () => {
       expect(
         validate(ctx, ["ResourceB"], {
           resourceType: "ResourceB",
@@ -161,7 +161,7 @@ describe("If the extension type is met in the data, validate both the extension 
             valueInteger: 4,
           },
         }),
-      ).resolves.toEqual({
+      ).toEqual({
         errors: [
           {
             message:

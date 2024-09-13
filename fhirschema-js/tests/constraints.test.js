@@ -23,22 +23,22 @@ describe("fhirpath constraints", () => {
     }),
   };
 
-  test("positive case, data passes constraint test", async () => {
+  test("positive case, data passes constraint test", () => {
     expect(
       validate(ctx, ["ResourceA"], {
         resourceType: "ResourceA",
         propertyA: "someValue",
       }),
-    ).resolves.toEqual({ errors: [] });
+    ).toEqual({ errors: [] });
   });
 
-  test("negative case, data fails constraint test", async () => {
+  test("negative case, data fails constraint test", () => {
     expect(
       validate(ctx, ["ResourceA"], {
         resourceType: "ResourceA",
         propertyA: "invalidValue",
       }),
-    ).resolves.toEqual({
+    ).toEqual({
       errors: [
         {
           constraint: "constraintA",

@@ -18,16 +18,16 @@ describe("Excluded elements must not be present in data", () => {
     }),
   };
 
-  test("positive case, excluded element is absent", async () => {
+  test("positive case, excluded element is absent", () => {
     expect(
       validate(ctx, ["Resource"], { resourceType: "Patient", b: "valueB" }),
-    ).resolves.toEqual({ errors: [] });
+    ).toEqual({ errors: [] });
   });
 
-  test("negative case, excluded element is present", async () => {
+  test("negative case, excluded element is present", () => {
     expect(
       validate(ctx, ["Resource"], { resourceType: "Patient", a: "valueA" }),
-    ).resolves.toEqual({
+    ).toEqual({
       errors: [
         {
           message: "excluded property a is present",

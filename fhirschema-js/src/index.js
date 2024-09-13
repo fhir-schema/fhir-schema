@@ -1,6 +1,6 @@
 import fhirpath from "fhirpath";
 import _ from "lodash";
-import axios from "axios";
+import syncRequest from "sync-request";
 
 function isMap(x) {
   return x?.constructor === {}.constructor;
@@ -257,16 +257,17 @@ const buildTerminologyValidationRequestPayload = (
   }
 };
 
-async function validateBinding(ctx, result, schema, data) {
+function validateBinding(ctx, result, schema, data) {
   const binding = schema.binding;
   const dataType = schema.type || inferCodedValueDataType(data);
+  const response = syncRequest.request("POST", ctx.termServerUrl, {
+    json: buildTerminologyValidationRequestPayload(binding, dataType, data),
+  });
 
-  const response = await axios.post(
-    ctx.termServerUrl,
-    buildTerminologyValidationRequestPayload(binding, dataType, data),
-  );
+  const responseParameters = JSON.parse(response.getBody("utf-8"));
+
   if (
-    !response?.data?.parameter?.find((param) => param.name === "result")
+    responseParameters?.parameter.find((param) => param.name === "result")
       .valueBoolean
   ) {
     addError(result, "terminology-binding", {
@@ -276,6 +277,10 @@ async function validateBinding(ctx, result, schema, data) {
   }
 }
 
+function validateBindingSync(ctx, result, schema, data) {
+  validateBinding(ctx, result, schema, data).finally(console.error);
+}
+
 let VALIDATORS = (sc) =>
   [
     [(sc) => "fixed" in sc, validateFixed],
@@ -283,7 +288,7 @@ let VALIDATORS = (sc) =>
     [(sc) => "constraints" in sc, validateConstraints],
     [(sc) => "required" in sc, validateRequired],
     [(sc) => "excluded" in sc, validateExcluded],
-    [(sc) => "binding" in sc, validateBinding],
+    [(sc) => "binding" in sc, validateBindingSync],
     [(sc) => sc.kind === "primitive-type", validatePrimitiveType],
     [(sc) => "elements" in sc, validateElements],
   ]
@@ -324,13 +329,6 @@ function each(obj, f) {
   for (var k in obj) {
     var v = obj[k];
     f(k, v);
-  }
-}
-
-async function eachWait(obj, f) {
-  for (var k in obj) {
-    var v = obj[k];
-    await f(k, v);
   }
 }
 
@@ -423,12 +421,9 @@ function checkChoiceIsIncludedInChoiceList(metChoices, schema, result) {
   });
 }
 
-async function validateSchemas(ctx, result, schemas, data) {
-  await eachWait(schemas, async (schk, sch) => {
-    const validators = VALIDATORS(sch).map(async (validator) => {
-      await validator(ctx, result, sch, data);
-    });
-    await Promise.all(validators);
+function validateSchemas(ctx, result, schemas, data) {
+  each(schemas, (schk, sch) => {
+    VALIDATORS(sch).forEach((validator) => validator(ctx, result, sch, data));
   });
 
   if (isMap(data)) {
@@ -436,13 +431,13 @@ async function validateSchemas(ctx, result, schemas, data) {
     let dataIsExtension = false;
     let dataIsNestedResource = false;
 
-    await eachWait(data, async (k, v) => {
+    each(data, (k, v) => {
       if (result.root && k === "resourceType") {
         result.root = false;
       } else {
         let elset = set();
         result.path.push(k);
-        each(schemas, async (schk, sch) => {
+        each(schemas, (schk, sch) => {
           let subsch = sch?.elements?.[k];
 
           if (subsch) {
@@ -475,11 +470,8 @@ async function validateSchemas(ctx, result, schemas, data) {
         } else {
           if (Array.isArray(v)) {
             validateSchemasArray(ctx, result, elset, v);
-
-            let i = 0;
-            for (const x of v) {
+            v.forEach((x, i) => {
               result.path.push(i);
-              i += 1;
               if (dataIsExtension) {
                 addSchemasToSet(
                   ctx,
@@ -495,9 +487,9 @@ async function validateSchemas(ctx, result, schemas, data) {
                 );
                 result.root = true;
               }
-              await validateSchemas(ctx, result, elset, x);
+              validateSchemas(ctx, result, elset, x);
               result.path.pop();
-            }
+            });
           } else {
             if (dataIsExtension) {
               // TODO FIXME WE NEED TO FOLD THAT INTO SOME FUNCTION? SMELLS
@@ -515,7 +507,7 @@ async function validateSchemas(ctx, result, schemas, data) {
               );
               result.root = true;
             }
-            await validateSchemas(ctx, result, elset, v);
+            validateSchemas(ctx, result, elset, v);
           }
         }
         result.path.pop();
@@ -524,12 +516,12 @@ async function validateSchemas(ctx, result, schemas, data) {
   }
 }
 
-export async function validate(ctx, schemaNames, data) {
+export function validate(ctx, schemaNames, data) {
   let schset = set();
   let result = { root: true, errors: [], path: [data?.resourceType] };
   schemaNames.forEach((x) => {
     addSchemasToSet(ctx, schset, resolveSchema(ctx, x));
   });
-  await validateSchemas(ctx, result, schset, data);
+  validateSchemas(ctx, result, schset, data);
   return { errors: result.errors };
 }

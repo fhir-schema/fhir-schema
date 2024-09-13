@@ -21,23 +21,23 @@ describe("`choiceOf` directive", () => {
     }),
   };
 
-  test("positive case, valid choice type", async () => {
+  test("positive case, valid choice type", () => {
     expect(
       validate(ctx, ["ResourceA"], {
         resourceType: "ResourceA",
         choicePrefixString: "valid string",
       }),
-    ).resolves.toEqual({ errors: [] });
+    ).toEqual({ errors: [] });
   });
 
-  test("negative case, multiple choices used (only one allowed)", async () => {
+  test("negative case, multiple choices used (only one allowed)", () => {
     expect(
       validate(ctx, ["ResourceA"], {
         resourceType: "ResourceA",
         choicePrefixString: "valid string",
         choicePrefixInteger: 42,
       }),
-    ).resolves.toEqual({
+    ).toEqual({
       errors: [
         {
           message:
@@ -55,13 +55,13 @@ describe("`choiceOf` directive", () => {
     });
   });
 
-  test("negative case, choices a constrained with `choices:` directive", async () => {
+  test("negative case, choices a constrained with `choices:` directive", () => {
     expect(
       validate(ctx, ["ResourceA"], {
         resourceType: "ResourceA",
         choicePrefixInteger: 4,
       }),
-    ).resolves.toEqual({
+    ).toEqual({
       errors: [
         {
           message:
@@ -107,22 +107,22 @@ describe("Limit possible choice type via `choice` directive in derived schema", 
     }),
   };
 
-  test("positive case, valid choice type", async () => {
+  test("positive case, valid choice type", () => {
     expect(
       validate(ctx, ["ProfileOnA"], {
         resourceType: "ResourceA",
         choicePrefixString: "valid string",
       }),
-    ).resolves.toEqual({ errors: [] });
+    ).toEqual({ errors: [] });
   });
 
-  test("negative case, choice type not allowed by ProfileOnA", async () => {
+  test("negative case, choice type not allowed by ProfileOnA", () => {
     expect(
       validate(ctx, ["ProfileOnA"], {
         resourceType: "ResourceA",
         choicePrefixInteger: 42,
       }),
-    ).resolves.toEqual({
+    ).toEqual({
       errors: [
         {
           message:

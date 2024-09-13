@@ -41,7 +41,7 @@ describe(`If Schema type is 'Resource', engine additionally validates data via s
   };
 
   describe("positive cases", () => {
-    test("Patient entry validates via actual Patient schema", async () => {
+    test("Patient entry validates via actual Patient schema", () => {
       expect(
         validate(ctx, ["Bundle"], {
           resourceType: "Bundle",
@@ -54,12 +54,12 @@ describe(`If Schema type is 'Resource', engine additionally validates data via s
             },
           ],
         }),
-      ).resolves.toEqual({ errors: [] });
+      ).toEqual({ errors: [] });
     });
   });
 
   describe("negative cases", () => {
-    test("Patient entry validates via actual Patient schema, invalid name prop", async () => {
+    test("Patient entry validates via actual Patient schema, invalid name prop", () => {
       expect(
         validate(ctx, ["Bundle"], {
           resourceType: "Bundle",
@@ -72,7 +72,7 @@ describe(`If Schema type is 'Resource', engine additionally validates data via s
             },
           ],
         }),
-      ).resolves.toEqual({
+      ).toEqual({
         errors: [
           {
             message: "expected string, got number",
