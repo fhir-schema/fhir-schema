@@ -1,0 +1,75 @@
+#!/usr/bin/env node
+
+import { Command } from "commander";
+import path from "path";
+import fs from "fs";
+import ora from "ora";
+import utils from "../src/utils.js";
+
+const program = new Command();
+
+program
+  .requiredOption(
+    "--packages <packages>",
+    'Packages coordinates (e.g. hl7.fhir.r4.core#4.0.1:hl7.fhir.us.core#6.1.0) delimited by ":"',
+    "hl7.fhir.r4.core#4.0.1",
+  )
+  .option("--file <file>", "Path to file, or provide file via STDIN")
+  .option(
+    "--terminology-server <url>",
+    "URL of the terminology server",
+    "https://tx.fhir.org/r4/ValueSet/$validate-code",
+  )
+  .parse(process.argv);
+
+const options = program.opts();
+
+const buildContext = async (options) => {
+  const spinner = ora("Building context").start();
+
+  const packages = options.packages.split(":");
+
+  const depsSpinner = ora(`Resolving deps from: ${packages}`).start();
+  const fullDepsTree = await utils.resolveDeps(packages);
+  depsSpinner.succeed(`Resolved deps: \n    ${fullDepsTree.join(",\n    ")}`);
+};
+
+const readFile = (filePath) => {
+  if (filePath) {
+    const absolutePath = path.resolve(filePath);
+    if (fs.existsSync(absolutePath)) {
+      const data = fs.readFileSync(absolutePath, "utf8");
+      return data;
+    } else {
+      spinner.fail("File not found");
+      process.exit(1);
+    }
+  } else if (!process.stdin.isTTY) {
+    let input = "";
+    process.stdin.on("data", (chunk) => {
+      input += chunk;
+    });
+    process.stdin.on("end", () => {
+      return input;
+    });
+  } else {
+    spinner.fail("No file provided via path or STDIN");
+    process.exit(1);
+  }
+};
+
+if (options.packages) {
+  await buildContext(options);
+
+  if (options.file) {
+    const fileContents = readFile(options.file);
+    console.log("File contents:", fileContents);
+  } else if (!process.stdin.isTTY) {
+    process.stdin.on("data", (data) => {
+      console.log("Received file via STDIN:", data.toString());
+    });
+  }
+} else {
+  spinner.fail("No packages provided");
+  program.help();
+}

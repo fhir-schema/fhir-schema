@@ -13,9 +13,6 @@ async function getSpecificLineFromNdjson(url, targetLine) {
     https
       .get(url, (response) => {
         if (response.statusCode !== 200) {
-          console.error(
-            `Failed to fetch: ${response.statusCode} ${response.statusMessage}`,
-          );
           return resolve(null);
         }
 
@@ -59,7 +56,6 @@ async function getSpecificLineFromNdjson(url, targetLine) {
         });
       })
       .on("error", (err) => {
-        console.error("Request error:", err.message);
         resolve(null);
       });
   });
@@ -116,33 +112,12 @@ async function obtainPackageDeps(packageCoordinate) {
   return fullDepsTree;
 }
 
-(async () => {
-  console.log(await obtainPackageDeps("hl7.fhir.us.core#5.0.0"));
-  return;
-})();
+async function resolveDeps(packageCoordinates) {
+  const fullDepsTree = await dependencyResolver(
+    new Set(),
+    new Set(packageCoordinates),
+  );
+  return fullDepsTree;
+}
 
-// resolve("hl7.fhir.us.core#5.0.0", 'https://hl7.fhir.us.core/StructureDefinition/us-core-patient')
-
-// resolve("hl7.fhir.us.core#5.0.0", resolve-url("hl7.fhir.us.core#5.0.0", 'Period'))
-
-// resolve(<url>, <package|package-coordinate>)
-
-// validate("hl7.fhir.us.core#5.0.0", { meta: {profile: ['https://hl7.fhir.us.core/StructureDefinition/us-core-patient']}})
-
-// resolve({dependencies: {}}, 'https://hl7.fhir.us.core/StructureDefinition/us-core-patient')
-
-// // ctx — your root package with deps
-
-// { meta: {profile: ['https://hl7.fhir.us.core/StructureDefinition/us-core-patient']}
-//   resourceType: 'Patient' }
-
-//     {deps: {hl7.fhir.r4.core 4.0.1
-//             hl7.fhir.us.core 5.0.1}}
-
-//   'Patient' -> 'https://hl7.fhir/StructureDefinition/Patient'
-
-// resolve('https://hl7.fhir.us.core/StructureDefinition/us-core-patient')
-
-// Patient -> 'https://hl7.fhir/StructureDefinition/Patient'
-// 'https://hl7.fhir/StructureDefinition/Patient' -> 'https://hl7.fhir/StructureDefinition/Patient|4.0.1'
-// 'https://hl7.fhir/StructureDefinition/Patient|4.0.1' -> {}
+export default { resolveDeps };
