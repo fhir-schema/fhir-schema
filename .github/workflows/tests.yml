@@ -15,5 +15,5 @@ jobs:
           bun-version: latest
       - name: Run tests
         working-directory: fhirschema-js
-        run: bun install && bun test
+        run: bun install && bun test tests
         continue-on-error: false
