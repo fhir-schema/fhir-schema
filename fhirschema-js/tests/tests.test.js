@@ -3,10 +3,10 @@ import { validate } from "../src/index.js";
 
 
 const cases = [
-  // require("../../tests/1_elements.json"),
-  // require("../../tests/2_base.json"),
-  // require("../../tests/3_choices.json"),
-  //require("../../tests/4_required.json"),
+  require("../../tests/1_elements.json"),
+  require("../../tests/2_base.json"),
+  require("../../tests/3_choices.json"),
+  require("../../tests/4_required.json"),
   require("../../tests/5_slices.json"),
 ]
 
