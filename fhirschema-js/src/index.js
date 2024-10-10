@@ -291,6 +291,54 @@ function validateChoices(ctx, result, schema, data) {
   }
 }
 
+function validateSlices(ctx, result, schemas, data) {
+  Object.values(schemas)
+    .filter(({ slicing }) => !!slicing)
+    .forEach((schema) => {
+      const counters = {};
+
+      data.forEach((dataelm, i) => {
+        each(schema.slicing.slices, (sliceName, sliceDef) => {
+          if (_.isMatch(dataelm, sliceDef.match.value)) {
+            counters[sliceName] = (counters[sliceName] || 0) + 1;
+            if (sliceDef.schema) {
+              result.path.push(i);
+
+              const newSchemas = {};
+              Object.assign(newSchemas, schemas);
+              addSchemasToSet(ctx, newSchemas, sliceDef.schema, sliceName);
+              // console.log('validate-slice',  JSON.stringify(dataelm), Object.keys(newSchemas))
+              validateSchemas(ctx, result, newSchemas, dataelm);
+              result.path.pop();
+            }
+          }
+        });
+      });
+
+      each(schema.slicing.slices, (sliceName, sliceDef) => {
+        const { min, max } = sliceDef;
+        const found = counters[sliceName] || 0;
+
+        if (min && found < min) {
+          addError(
+            result,
+            "slice-cardinality",
+            `Slice defines the following min cardinality: ${formatValue(min)}, actual cardinality: ${formatValue(found)}`,
+          );
+        }
+
+        if (max && found > max) {
+          addError(
+            result,
+            "slice-cardinality",
+            `Slice defines the following max cardinality: ${formatValue(max)}, actual cardinality: ${formatValue(found)}`,
+          );
+        }
+      });
+    });
+}
+
+
 let VALIDATORS = {
   fixed:       validateFixed,
   pattern:     validatePattern,
@@ -389,51 +437,6 @@ function validateSchemasArray(ctx, result, schemas, data) {
   });
 }
 
-function validateSlices(ctx, result, schemas, data) {
-  Object.values(schemas)
-    .filter(({ slicing }) => !!slicing)
-    .forEach((schema) => {
-      const counters = {};
-
-      data.forEach((dataelm, i) => {
-        each(schema.slicing.slices, (sliceName, sliceDef) => {
-          if (_.isMatch(dataelm, sliceDef.match.value)) {
-            counters[sliceName] = (counters[sliceName] || 0) + 1;
-            if (sliceDef.schema) {
-              result.path.push(i);
-
-              const newSchemas = {};
-              Object.assign(newSchemas, schemas);
-              addSchemasToSet(ctx, newSchemas, sliceDef.schema);
-              validateSchemas(ctx, result, newSchemas, dataelm);
-              result.path.pop();
-            }
-          }
-        });
-      });
-
-      each(schema.slicing.slices, (sliceName, sliceDef) => {
-        const { min, max } = sliceDef;
-        const found = counters[sliceName] || 0;
-
-        if (min && found < min) {
-          addError(
-            result,
-            "slice-cardinality",
-            `Slice defines the following min cardinality: ${formatValue(min)}, actual cardinality: ${formatValue(found)}`,
-          );
-        }
-
-        if (max && found > max) {
-          addError(
-            result,
-            "slice-cardinality",
-            `Slice defines the following max cardinality: ${formatValue(max)}, actual cardinality: ${formatValue(found)}`,
-          );
-        }
-      });
-    });
-}
 
 // 1. shape validation (isObject/isArray/isPrimitive?)
 // 2. type validation (resolve types / check primitives) — type and elements keywords
@@ -590,7 +593,8 @@ const IGNORE = {
   "name": true,
   "type": true,
   "array": true,
-  "base": true
+  "base": true,
+  "slicing": true
 }
 
 function validateSchemas(ctx, result, schemas, data) {
@@ -601,7 +605,7 @@ function validateSchemas(ctx, result, schemas, data) {
       if (validator){
         validator(ctx, result, subsch, data)
       } else {
-        if(!IGNORE[key]) {
+        if(!IGNORE[key] && !ARRAY_VALIDATORS[key]) {
           console.log(`No validator for ${key}`)
         }
       }
@@ -661,8 +665,10 @@ function validateSchemas(ctx, result, schemas, data) {
         addError(result, "unknown-element", `${k} is unknown`);
       } else {
         if (Array.isArray(v)) {
-          // validateSchemasArray(ctx, result, elset, v);
-          // validateSlices(ctx, result, elset, v);
+
+          validateSchemasArray(ctx, result, elset, v);
+          validateSlices(ctx, result, elset, v);
+
           v.forEach((x, i) => {
             result.path.push(i);
             validateSchemas(ctx, result, elset, x);
