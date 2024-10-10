@@ -1,0 +1,32 @@
+{
+  "desc": "extensions",
+  "schemas": {
+    "string":  { "kind": "primitive-type" },
+    "integer": { "kind": "primitive-type" },
+    "Resource": {
+      "elements": {
+        "collection": {
+          "array": true
+        }
+      }
+    },
+    "Profile": {
+      "elements": {
+        "collection": {
+          "slices": {
+
+          }
+        }
+      }
+    }
+  },
+  "tests": [
+    {
+      "desc": "choice string",
+      "data": {
+        "resourceType": "Resource",
+        "choiceString": "ok"
+      }
+    }
+  ]
+}

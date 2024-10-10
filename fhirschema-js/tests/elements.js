@@ -1,10 +1,3 @@
-import { describe, expect, test } from "bun:test";
-import { validate } from "../src/index.js";
-
-const createSchemaResolver = (store) => (url, _opts) => store[url];
-
-let valid = { errors: [] };
-
 let schemas = {
   string: {
     kind: "primitive-type"
@@ -47,7 +40,7 @@ let schemas = {
   }
 };
 
-let tests = {
+export const tests = {
   schemas: schemas,
   desc: 'test elements and arrays',
   tests: [
@@ -227,24 +220,3 @@ let tests = {
     },
   ]
 }
-
-
-describe("basic elements", () => {
-
-  let resolver = (url)=>{ return tests.schemas[url] }
-  const ctx = { schemaResolver: resolver }
-
-  tests.tests.forEach((tst)=>{
-    let run = tests.focus ? tst.focus : true
-    if(!run) return
-    test(tst.desc, ()=> {
-      let res = validate(ctx, tst.schemas || [], tst.data)
-      if(tst.errors){
-        expect(res.errors).toEqual(tst.errors)
-      } else {
-        expect(res.errors).toEqual([])
-      }
-    })
-  })
-
-});

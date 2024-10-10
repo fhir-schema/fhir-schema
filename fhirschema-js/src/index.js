@@ -17,24 +17,24 @@ function formatValue(v) {
 function getType(input) {
   const type = Object.prototype.toString.call(input);
   switch (type) {
-    case "[object Array]":
-      return "array";
-    case "[object Object]":
-      return "object";
-    case "[object String]":
-      return "string";
-    case "[object Number]":
-      return "number";
-    case "[object Boolean]":
-      return "boolean";
-    case "[object Null]":
-      return "null";
-    case "[object Undefined]":
-      return "null";
-    case "[object Date]":
-      return "date";
-    default:
-      return "unknown";
+  case "[object Array]":
+    return "array";
+  case "[object Object]":
+    return "object";
+  case "[object String]":
+    return "string";
+  case "[object Number]":
+    return "number";
+  case "[object Boolean]":
+    return "boolean";
+  case "[object Null]":
+    return "null";
+  case "[object Undefined]":
+    return "null";
+  case "[object Date]":
+    return "date";
+  default:
+    return "unknown";
   }
 }
 
@@ -54,9 +54,9 @@ function addError(result, type, message) {
 
 const fhirPrimitiveTypeValidators = {
   integer: (data, schema) =>
-    Number.isSafeInteger(data)
-      ? null
-      : `expected ${schema.type}, got ${getType(data)}`,
+  Number.isSafeInteger(data)
+    ? null
+    : `expected ${schema.type}, got ${getType(data)}`,
   string: (data, schema) => {
     if (!(getType(data) === "string")) {
       return `expected ${schema.type}, got ${getType(data)}`;
@@ -80,11 +80,13 @@ const fhirPrimitiveTypeValidators = {
 };
 
 function validatePrimitiveType(ctx, result, schema, data) {
-  const primitiveValidator = fhirPrimitiveTypeValidators[schema.type];
+  const primitiveValidator = fhirPrimitiveTypeValidators[schema.name];
   console.assert(
     primitiveValidator,
-    `No validator for primititve type ${schema.type} of schema ${schema}`,
+    `No validator for primititve type ${schema.type} of schema`,
+    schema
   );
+
 
   const err = primitiveValidator(data, schema);
 
@@ -96,7 +98,7 @@ function validatePrimitiveType(ctx, result, schema, data) {
 function validateRequired(ctx, result, schema, data) {
   let tp = getType(data);
   if (tp === "object") {
-    schema.required.forEach((k) => {
+    schema.forEach((k) => {
       result.path.push(k);
       if (!(k in data)) {
         addError(result, "required", `${k} is required`);
@@ -127,6 +129,14 @@ function ensureArray(data) {
   let tp = getType(data);
   if (tp !== "array") {
     // addError(result, "type", `expected array got ${tp}`);
+    return true;
+  }
+}
+
+function validateArray(ctx, result, schema, data) {
+  let tp = getType(data);
+  if (tp !== "array") {
+    addError(result, "type", `expected array got ${tp}`);
     return true;
   }
 }
@@ -274,19 +284,24 @@ function validateBinding(ctx, result, schema, data) {
   }
 }
 
-let VALIDATORS = (sc) =>
-  [
-    [(sc) => "fixed" in sc, validateFixed],
-    [(sc) => "pattern" in sc, validatePattern],
-    [(sc) => "constraints" in sc, validateConstraints],
-    [(sc) => "required" in sc, validateRequired],
-    [(sc) => "excluded" in sc, validateExcluded],
-    [(sc) => "binding" in sc, validateBinding],
-    [(sc) => sc.kind === "primitive-type", validatePrimitiveType],
-    [(sc) => "elements" in sc, validateElements],
-  ]
-    .filter((el) => el[0](sc))
-    .map((el) => el[1]);
+function validateChoices(ctx, result, schema, data) {
+  let item = result.path[result.path.length - 1];
+  if(! schema.some((x)=> { return item == x })) {
+    addError(result, "choice-excluded", `${item} is excluded choice`);
+  }
+}
+
+let VALIDATORS = {
+  fixed:       validateFixed,
+  pattern:     validatePattern,
+  constraints: validateConstraints,
+  required:    validateRequired,
+  excluded:    validateExcluded,
+  binding:     validateBinding,
+  elements:    validateElements,
+  choices:     validateChoices,
+  // array:       validateArray,
+};
 
 let ARRAY_VALIDATORS = {
   array: validateArray,
@@ -299,7 +314,7 @@ function resolveSchema(ctx, schemaName) {
   if (sch) {
     return sch;
   } else {
-    throw new Error("could not resolve [" + schemaName + "]");
+    throw new Error("could not resolve [" + JSON.stringify(schemaName) + "]");
   }
 }
 
@@ -335,18 +350,31 @@ function isReferenceOnResource(ref) {
   return ref === "Resource";
 }
 
-function addSchemasToSet(ctx, set, schema) {
+function addSchemasToSet(ctx, set, schema, schemaName) {
+  schema.name ||= schemaName;
   if (schema) {
     if (schema.base && !set[schema.base]) {
-      addSchemasToSet(ctx, set, resolveSchema(ctx, schema.base));
-    }
-    if (schema.type && !set[schema.type] && schema.kind !== "primitive-type") {
-      const resolvedTypeSchema = resolveSchema(ctx, schema.type);
-      if (resolvedTypeSchema) {
-        addSchemasToSet(ctx, set, resolvedTypeSchema);
+      let sch = resolveSchema(ctx, schema.base);
+      if(sch){
+        addSchemasToSet(ctx, set, sch, schema.base);
+      } else {
+        console.assert(false, `Schema ${name} is not found`)
       }
     }
-    set[schema.name] = schema;
+    if (schema.type && !set[schema.type] && schema.kind !== "primitive-type") {
+      let sch = resolveSchema(ctx, schema.type);
+      if (sch) {
+        addSchemasToSet(ctx, set, sch,  schema.type);
+      } else {
+        console.assert(false, `Schema ${name} is not found`)
+      }
+    }
+
+    if( schema.name ){
+      set[schema.name] = schema;
+    } else {
+      console.assert(false, "There is no name for schema", schema)
+    }
   }
 }
 
@@ -462,9 +490,18 @@ function checkChoiceIsIncludedInChoiceList(metChoices, schema, result) {
   });
 }
 
-function validateSchemas(ctx, result, schemas, data) {
+function validateSchemasOld(ctx, result, schemas, data) {
   each(schemas, (schk, sch) => {
-    VALIDATORS(sch).forEach((validator) => validator(ctx, result, sch, data));
+    for (const key in sch) {
+      if (sch.hasOwnProperty(key)) {
+        let validator = VALIDATORS[key]
+        if (validator){
+          validator(ctx, result, sch, data)
+        } else {
+          console.log(`No validator for ${key}`)
+        }
+      }
+    }
   });
 
   if (isMap(data)) {
@@ -472,12 +509,17 @@ function validateSchemas(ctx, result, schemas, data) {
     let dataIsExtension = false;
     let dataIsNestedResource = false;
 
+    // we walk the data by k/v
+
     each(data, (k, v) => {
       if (result.root && k === "resourceType") {
         result.root = false;
       } else {
         let elset = set();
         result.path.push(k);
+        // collect subschemas for the key
+        // we can determinie here that should it be an array or singular
+        // and check later
         each(schemas, (schk, sch) => {
           let subsch = sch?.elements?.[k];
 
@@ -516,18 +558,10 @@ function validateSchemas(ctx, result, schemas, data) {
             v.forEach((x, i) => {
               result.path.push(i);
               if (dataIsExtension) {
-                addSchemasToSet(
-                  ctx,
-                  elset,
-                  resolveSchemaFromUrl(ctx, x.url, result.path),
-                );
+                addSchemasToSet(ctx, elset, resolveSchemaFromUrl(ctx, x.url, result.path));
               }
               if (dataIsNestedResource) {
-                addSchemasToSet(
-                  ctx,
-                  elset,
-                  resolveSchemaFromUrl(ctx, x.resourceType, result.path),
-                );
+                addSchemasToSet(ctx, elset, resolveSchemaFromUrl(ctx, x.resourceType, result.path));
                 result.root = true;
               }
               validateSchemas(ctx, result, elset, x);
@@ -536,18 +570,10 @@ function validateSchemas(ctx, result, schemas, data) {
           } else {
             if (dataIsExtension) {
               // TODO FIXME WE NEED TO FOLD THAT INTO SOME FUNCTION? SMELLS
-              addSchemasToSet(
-                ctx,
-                elset,
-                resolveSchemaFromUrl(ctx, v.url, result.path),
-              );
+              addSchemasToSet(ctx, elset, resolveSchemaFromUrl(ctx, v.url, result.path));
             }
             if (dataIsNestedResource) {
-              addSchemasToSet(
-                ctx,
-                elset,
-                resolveSchemaFromUrl(ctx, v.resourceType, result.path),
-              );
+              addSchemasToSet(ctx, elset, resolveSchemaFromUrl(ctx, v.resourceType, result.path));
               result.root = true;
             }
             validateSchemas(ctx, result, elset, v);
@@ -559,11 +585,106 @@ function validateSchemas(ctx, result, schemas, data) {
   }
 }
 
+const IGNORE = {
+  "kind": true,
+  "name": true,
+  "type": true,
+  "array": true,
+  "base": true
+}
+
+function validateSchemas(ctx, result, schemas, data) {
+  // basic keyword validators
+  each(schemas, (schk, sch) => {
+    each(sch, (key,subsch)=>{
+      let validator = VALIDATORS[key]
+      if (validator){
+        validator(ctx, result, subsch, data)
+      } else {
+        if(!IGNORE[key]) {
+          console.log(`No validator for ${key}`)
+        }
+      }
+    })
+  });
+
+  if (isMap(data)) {
+    // we walk the data by k/v
+    each(data, (k, v) => {
+      let elset = set();
+      result.path.push(k);
+
+      // collect subschemas for the key
+      let choiceOf = null;
+      each(schemas, (schk, sch) => {
+        let subsch = sch?.elements?.[k];
+
+        if (subsch && ! subsch.choices ) {
+          subsch.name = sch.name + "." + k; // TODO FIXME
+          addSchemasToSet(ctx, elset, subsch);
+        }
+        if(subsch && subsch.choiceOf) {
+          choiceOf = subsch.choiceOf
+        }
+        // shall we handle choiceOf here and add choice schema to the eset
+      });
+
+      // if we found choiceOf - we have to collect all choice branches from all schemas
+      if(choiceOf){
+        each(schemas, (nm, sch)=>{
+          let choicesch = sch?.elements?.[choiceOf]
+          if(choicesch){
+            choicesch.name = sch.name + "." + k; // TODO FIXME
+            addSchemasToSet(ctx, elset, choicesch);
+          }
+        })
+      }
+
+      let isArray = false;
+      Object.keys(elset).some((nm)=>{
+        let sch = elset[nm]
+        if(sch.array){ isArray = true}
+      })
+
+      if(isArray){
+        if(! Array.isArray(v)){
+          addError(result, "not-array", `${k} is not array`);
+        }
+      } else {
+        if(Array.isArray(v)){
+          addError(result, "not-singular", `${k} is not singular`);
+        }
+      }
+      // check array or singular
+
+      if (Object.keys(elset).length === 0) {
+        addError(result, "unknown-element", `${k} is unknown`);
+      } else {
+        if (Array.isArray(v)) {
+          // validateSchemasArray(ctx, result, elset, v);
+          // validateSlices(ctx, result, elset, v);
+          v.forEach((x, i) => {
+            result.path.push(i);
+            validateSchemas(ctx, result, elset, x);
+            result.path.pop();
+          });
+        } else {
+          validateSchemas(ctx, result, elset, v);
+        }
+      }
+      result.path.pop();
+    });
+  }
+}
+
 export function validate(ctx, schemaNames, data) {
   let schset = set();
   let result = { root: true, errors: [], path: [data?.resourceType] };
+  if(data.resourceType){
+    addSchemasToSet(ctx, schset, resolveSchema(ctx, data.resourceType), data.resourceType);
+  }
   schemaNames.forEach((x) => {
-    addSchemasToSet(ctx, schset, resolveSchema(ctx, x));
+    addSchemasToSet(ctx, schset, resolveSchema(ctx, x), x);
   });
   validateSchemas(ctx, result, schset, data);
   return { errors: result.errors };

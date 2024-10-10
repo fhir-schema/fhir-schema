@@ -1,0 +1,62 @@
+{
+  "desc": "slices keyword",
+  "schemas": {
+    "string":  { "kind": "primitive-type" },
+    "Resource": {
+      "elements": {
+        "resourceType": {"type": "string"},
+        "address": {
+          "array": true,
+          "elements": {
+            "use": {"type": "string"},
+            "city": {"type": "string"},
+            "postalCode": {"type": "string"},
+            "line": {"type": "string", "array": true}
+          }
+        }
+      }
+    },
+    "Profile": {
+      "base": "Resource",
+      "elements": {
+        "address": {
+          "slices": {
+            "home": {
+              "match": {"use": "home"},
+              "required": ["city"]
+            },
+            "work": {
+              "match": {"use": "work"},
+              "required": ["city", "postalCode"]
+            }
+          }
+        }
+      }
+    }
+  },
+  "tests": [
+    {
+      "desc": "valid slices",
+      "data": {
+        "resourceType": "Profile",
+        "address": [
+          {"use": "home", "city": "CITY"},
+          {"use": "work", "city": "CITY", "postalCode": "CODE"}
+        ]
+      }
+    },
+    {
+      "desc": "missed slice home",
+      "data": {
+        "resourceType": "Profile",
+        "address": [
+          {"use": "work", "city": "CITY", "postalCode": "CODE"}
+        ]
+      },
+      "errors": [
+        {"path": "Profile.slice"}
+      ]
+    }
+
+  ]
+}
