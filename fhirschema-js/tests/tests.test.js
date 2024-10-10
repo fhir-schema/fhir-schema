@@ -2,12 +2,17 @@ import { describe, expect, test } from "bun:test";
 import { validate } from "../src/index.js";
 
 
-const cases = [
+const cases2 = [
   require("../../tests/1_elements.json"),
   require("../../tests/2_base.json"),
   require("../../tests/3_choices.json"),
   require("../../tests/4_required.json"),
   require("../../tests/5_slices.json"),
+  require("../../tests/6_extensions.json"),
+]
+
+const cases = [
+  require("../../tests/6_extensions.json"),
 ]
 
 cases.forEach((tcase)=>{

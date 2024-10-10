@@ -2,30 +2,37 @@
   "desc": "extensions",
   "schemas": {
     "string":  { "kind": "primitive-type" },
-    "integer": { "kind": "primitive-type" },
-    "Resource": {
+    "http://hl7.org/us-core-race": { "kind": "extension" },
+    "Extension": {
       "elements": {
-        "collection": {
-          "array": true
-        }
+        "url": {"type": "string"},
+        "value": {"choices": ["valueString"]},
+        "valueString": {"choiceOf": "value", "type": "string"}
       }
     },
-    "Profile": {
-      "elements": {
-        "collection": {
-          "slices": {
-
-          }
+    "Resource": {
+      "extensions": {
+        "us-core-race": {
+          "url": "http://hl7.org/us-core-race",
+          "max": 1
         }
+      },
+      "elements": {
+        "resourceType": { "type": "string" },
+        "extension":    { "type": "Extension", "array": true },
+        "element":      { "type": "string" }
       }
     }
   },
   "tests": [
     {
-      "desc": "choice string",
+      "desc": "unknown extension",
       "data": {
         "resourceType": "Resource",
-        "choiceString": "ok"
+        "extension": [{
+          "url": "unknown",
+          "valueString": "string"
+        }]
       }
     }
   ]
