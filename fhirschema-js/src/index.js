@@ -614,6 +614,8 @@ function validateSchemas(ctx, result, schemas, data) {
 
   if (isMap(data)) {
     // we walk the data by k/v
+
+    let multiChoice = {};
     each(data, (k, v) => {
       let elset = set();
       result.path.push(k);
@@ -629,8 +631,9 @@ function validateSchemas(ctx, result, schemas, data) {
         }
         if(subsch && subsch.choiceOf) {
           choiceOf = subsch.choiceOf
+          multiChoice[choiceOf] ||= []
+          multiChoice[choiceOf].push(k)
         }
-        // shall we handle choiceOf here and add choice schema to the eset
       });
 
       // if we found choiceOf - we have to collect all choice branches from all schemas
@@ -643,6 +646,7 @@ function validateSchemas(ctx, result, schemas, data) {
           }
         })
       }
+
 
       let isArray = false;
       Object.keys(elset).some((nm)=>{
@@ -679,6 +683,19 @@ function validateSchemas(ctx, result, schemas, data) {
         }
       }
       result.path.pop();
+    });
+
+    // post hook
+    each(multiChoice, (ch, chs)=>{
+      if(chs.length > 1){
+        result.path.push(ch);
+        addError(
+          result,
+          "choice",
+          `only one choice for ${ch} allowed, but multiple found: ${chs.join(', ')}`,
+        );
+        result.path.pop(ch);
+      }
     });
   }
 }

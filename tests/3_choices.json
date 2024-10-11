@@ -57,9 +57,9 @@
         "choiceInteger": 1
       },
       "errors": [{
-        "type": "choice-conflict",
+        "type": "choice",
         "path": "Resource.choice",
-        "message": "TBD"
+        "message": "only one choice for choice allowed, but multiple found: choiceString, choiceInteger"
       }]
     },
     {
