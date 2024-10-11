@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { validate } from "../src/index.js";
 
 
-const cases2 = [
+const cases = [
   require("../../tests/1_elements.json"),
   require("../../tests/2_base.json"),
   require("../../tests/3_choices.json"),
@@ -11,7 +11,7 @@ const cases2 = [
   require("../../tests/6_extensions.json"),
 ]
 
-const cases = [
+const cases_ = [
   require("../../tests/6_extensions.json"),
 ]
 

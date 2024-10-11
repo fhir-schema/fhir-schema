@@ -2,12 +2,15 @@
   "desc": "extensions",
   "schemas": {
     "string":  { "kind": "primitive-type" },
-    "http://hl7.org/us-core-race": { "kind": "extension" },
+    "http://hl7.org/us-core-race": {
+      "kind": "extension"
+    },
     "Extension": {
       "elements": {
         "url": {"type": "string"},
-        "value": {"choices": ["valueString"]},
-        "valueString": {"choiceOf": "value", "type": "string"}
+        "value": {"choices": ["valueString", "valueCode"]},
+        "valueString": {"choiceOf": "value", "type": "string"},
+        "valueCode":   {"choiceOf": "value", "type": "string"}
       }
     },
     "Resource": {
@@ -26,13 +29,34 @@
   },
   "tests": [
     {
-      "desc": "unknown extension",
+      "desc": "unknown extension - just check the shape",
       "data": {
         "resourceType": "Resource",
-        "extension": [{
-          "url": "unknown",
-          "valueString": "string"
-        }]
+        "extension": [
+          {
+            "url": "unknown",
+            "valueString": "string"
+          },
+          {
+            "url": "unknown",
+            "valueCode": "code"
+          }
+        ]
+      }
+    },
+    {
+      "desc": "broken extension schema",
+      "data": {
+        "resourceType": "Resource",
+        "extension": [
+          {
+            "url": "http://hl7.org/us-core-race",
+            "valueCode": "wrong"
+          }
+        ]
+      },
+      "errors": {
+        "path": "Resource.extension.0"
       }
     }
   ]

@@ -50,6 +50,19 @@
       }]
     },
     {
+      "desc": "choices conflict - two at the same time",
+      "data": {
+        "resourceType": "Resource",
+        "choiceString": "ok",
+        "choiceInteger": 1
+      },
+      "errors": [{
+        "type": "choice-conflict",
+        "path": "Resource.choice",
+        "message": "TBD"
+      }]
+    },
+    {
       "desc": "unknown element",
       "data": {
         "resourceType": "Resource",
