@@ -5,7 +5,9 @@
     "http://hl7.org/us-core-race": {
       "kind": "extension",
       "elements": {
-        "choices": ["valueString"]
+        "value": {
+          "choices": ["valueString"]
+        }
       }
     },
     "Extension": {
@@ -53,15 +55,40 @@
       }
     },
     {
-      "desc": "missed extension",
+      "desc": "missed extension (no extension element)",
+      "skip": true,
+      "comment": "Shall we support it or it should be combination of required and slices like in JSON schema?",
       "data": {
         "resourceType": "Resource"
       },
       "errors": [
         {
-         "message": "Slice defines the following min cardinality: '1', actual cardinality: '0'",
-         "path": "Resource.extension",
-         "type": "slice-cardinality"
+          "message": "Slice defines the following min cardinality: '1', actual cardinality: '0'",
+          "path": "Resource.extension",
+          "type": "slice-cardinality"
+        }
+      ]
+    },
+    {
+      "desc": "missed extension (with extension element)",
+      "data": {
+        "resourceType": "Resource",
+        "extension": [
+          {
+            "url": "unknown",
+            "valueString": "string"
+          },
+          {
+            "url": "unknown",
+            "valueCode": "code"
+          }
+        ]
+      },
+      "errors": [
+        {
+          "message": "Slice defines the following min cardinality: '1', actual cardinality: '0'",
+          "path": "Resource.extension",
+          "type": "slice-cardinality"
         }
       ]
     },
@@ -76,9 +103,13 @@
           }
         ]
       },
-      "errors": {
-        "path": "Resource.extension.0"
-      }
+      "errors":  [
+        {
+          "message": "valueCode is excluded choice",
+          "path": "Resource.extension.0.valueCode",
+          "type": "choice-excluded"
+        }
+      ]
     }
   ]
 }

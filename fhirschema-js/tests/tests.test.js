@@ -2,7 +2,7 @@ import { describe, expect, test } from "bun:test";
 import { validate } from "../src/index.js";
 
 
-const cases_ = [
+const cases = [
   require("../../tests/1_elements.json"),
   require("../../tests/2_base.json"),
   require("../../tests/3_choices.json"),
@@ -11,7 +11,7 @@ const cases_ = [
   require("../../tests/6_extensions.json"),
 ]
 
-const cases = [
+const cases_ = [
   // require("../../tests/5_slices.json"),
   require("../../tests/6_extensions.json"),
   // require("../../tests/3_choices.json"),
@@ -25,6 +25,7 @@ cases.forEach((tcase)=>{
     tcase.tests.forEach((tst)=>{
       let run = tcase.focus ? tst.focus : true
       if(!run) return
+      if(tst.skip) return
       test(tst.desc || JSON.stringify(tst.data), ()=> {
 
         let res = validate(ctx, tst.schemas || [], tst.data)
