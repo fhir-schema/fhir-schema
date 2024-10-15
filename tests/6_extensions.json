@@ -3,7 +3,10 @@
   "schemas": {
     "string":  { "kind": "primitive-type" },
     "http://hl7.org/us-core-race": {
-      "kind": "extension"
+      "kind": "extension",
+      "elements": {
+        "choices": ["valueString"]
+      }
     },
     "Extension": {
       "elements": {

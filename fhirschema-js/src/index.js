@@ -291,6 +291,7 @@ function validateChoices(ctx, result, schema, data) {
   }
 }
 
+// handle extensions here
 function validateSlices(ctx, result, schemas, data) {
   Object.values(schemas)
     .filter(({ slicing }) => !!slicing)
@@ -337,6 +338,7 @@ function validateSlices(ctx, result, schemas, data) {
       });
     });
 }
+
 
 
 let VALIDATORS = {
@@ -493,100 +495,6 @@ function checkChoiceIsIncludedInChoiceList(metChoices, schema, result) {
   });
 }
 
-function validateSchemasOld(ctx, result, schemas, data) {
-  each(schemas, (schk, sch) => {
-    for (const key in sch) {
-      if (sch.hasOwnProperty(key)) {
-        let validator = VALIDATORS[key]
-        if (validator){
-          validator(ctx, result, sch, data)
-        } else {
-          console.log(`No validator for ${key}`)
-        }
-      }
-    }
-  });
-
-  if (isMap(data)) {
-    const metChoices = {};
-    let dataIsExtension = false;
-    let dataIsNestedResource = false;
-
-    // we walk the data by k/v
-
-    each(data, (k, v) => {
-      if (result.root && k === "resourceType") {
-        result.root = false;
-      } else {
-        let elset = set();
-        result.path.push(k);
-        // collect subschemas for the key
-        // we can determinie here that should it be an array or singular
-        // and check later
-        each(schemas, (schk, sch) => {
-          let subsch = sch?.elements?.[k];
-
-          if (subsch) {
-            subsch.name = sch.name + "." + k; // TODO FIXME
-            addSchemasToSet(ctx, elset, subsch);
-
-            if (isReferenceOnExtension(subsch.type)) {
-              dataIsExtension = true;
-            }
-
-            if (isReferenceOnResource(subsch.type)) {
-              dataIsNestedResource = true;
-            }
-
-            const choiceOf = subsch.choiceOf;
-            if (choiceOf) {
-              checkOnlyOneChoicePresent(metChoices, choiceOf, k, result);
-              metChoices[choiceOf] = [...(metChoices[choiceOf] || []), k];
-            }
-          }
-        });
-
-        // post schemas spin validations
-        each(schemas, (_, schema) => {
-          checkChoiceIsIncludedInChoiceList(metChoices, schema, result);
-        });
-
-        if (Object.keys(elset).length === 0) {
-          addError(result, "unknown-element", `${k} is unknown`);
-        } else {
-          if (Array.isArray(v)) {
-            validateSchemasArray(ctx, result, elset, v);
-            validateSlices(ctx, result, elset, v);
-
-            v.forEach((x, i) => {
-              result.path.push(i);
-              if (dataIsExtension) {
-                addSchemasToSet(ctx, elset, resolveSchemaFromUrl(ctx, x.url, result.path));
-              }
-              if (dataIsNestedResource) {
-                addSchemasToSet(ctx, elset, resolveSchemaFromUrl(ctx, x.resourceType, result.path));
-                result.root = true;
-              }
-              validateSchemas(ctx, result, elset, x);
-              result.path.pop();
-            });
-          } else {
-            if (dataIsExtension) {
-              // TODO FIXME WE NEED TO FOLD THAT INTO SOME FUNCTION? SMELLS
-              addSchemasToSet(ctx, elset, resolveSchemaFromUrl(ctx, v.url, result.path));
-            }
-            if (dataIsNestedResource) {
-              addSchemasToSet(ctx, elset, resolveSchemaFromUrl(ctx, v.resourceType, result.path));
-              result.root = true;
-            }
-            validateSchemas(ctx, result, elset, v);
-          }
-        }
-        result.path.pop();
-      }
-    });
-  }
-}
 
 const IGNORE = {
   "kind": true,
@@ -597,7 +505,7 @@ const IGNORE = {
   "slicing": true
 }
 
-function validateSchemas(ctx, result, schemas, data) {
+function evalValidators(ctx, result, schemas, data) {
   // basic keyword validators
   each(schemas, (schk, sch) => {
     each(sch, (key,subsch)=>{
@@ -611,93 +519,118 @@ function validateSchemas(ctx, result, schemas, data) {
       }
     })
   });
+}
 
-  if (isMap(data)) {
-    // we walk the data by k/v
+function collectSchemasForElement(ctx, elset, schemas, evalCtx, k) {
+  let choiceOf = null;
+  each(schemas, (schk, sch) => {
+    let subsch = sch?.elements?.[k];
 
-    let multiChoice = {};
-    each(data, (k, v) => {
-      let elset = set();
-      result.path.push(k);
-
-      // collect subschemas for the key
-      let choiceOf = null;
-      each(schemas, (schk, sch) => {
-        let subsch = sch?.elements?.[k];
-
-        if (subsch && ! subsch.choices ) {
-          subsch.name = sch.name + "." + k; // TODO FIXME
-          addSchemasToSet(ctx, elset, subsch);
-        }
-        if(subsch && subsch.choiceOf) {
-          choiceOf = subsch.choiceOf
-          multiChoice[choiceOf] ||= []
-          multiChoice[choiceOf].push(k)
-        }
-      });
-
-      // if we found choiceOf - we have to collect all choice branches from all schemas
-      if(choiceOf){
-        each(schemas, (nm, sch)=>{
-          let choicesch = sch?.elements?.[choiceOf]
-          if(choicesch){
-            choicesch.name = sch.name + "." + k; // TODO FIXME
-            addSchemasToSet(ctx, elset, choicesch);
-          }
-        })
+    if (subsch && ! subsch.choices ) {
+      subsch.name = sch.name + "." + k; // TODO FIXME
+      addSchemasToSet(ctx, elset, subsch);
+    }
+    if(subsch && subsch.choiceOf) {
+      choiceOf = subsch.choiceOf
+      evalCtx.multiChoice[choiceOf] ||= []
+      evalCtx.multiChoice[choiceOf].push(k)
+    }
+  });
+  // if we found choiceOf - we have to collect all choice branches from all schemas
+  if(choiceOf){
+    each(schemas, (nm, sch)=>{
+      let choicesch = sch?.elements?.[choiceOf]
+      if(choicesch){
+        choicesch.name = sch.name + "." + k; // TODO FIXME
+        addSchemasToSet(ctx, elset, choicesch);
       }
+    })
+  }
+}
 
+function isElementArray(elset) {
+  return Object.keys(elset).some((nm)=>{
+    let sch = elset[nm]
+    if(sch.array){
+      return  true
+    }
+  })
+}
 
-      let isArray = false;
-      Object.keys(elset).some((nm)=>{
-        let sch = elset[nm]
-        if(sch.array){ isArray = true}
-      })
+function validateArrayType(result, elset, k, v) {
+  if(isElementArray(elset)){
+    if(! Array.isArray(v)){
+      addError(result, "not-array", `${k} is not array`);
+    }
+  } else {
+    if(Array.isArray(v)){
+      addError(result, "not-singular", `${k} is not singular`);
+    }
+  }
+}
 
-      if(isArray){
-        if(! Array.isArray(v)){
-          addError(result, "not-array", `${k} is not array`);
-        }
-      } else {
-        if(Array.isArray(v)){
-          addError(result, "not-singular", `${k} is not singular`);
-        }
-      }
-      // check array or singular
+function isEmpty(elset) {
+  return Object.keys(elset).length === 0
+}
 
-      if (Object.keys(elset).length === 0) {
-        addError(result, "unknown-element", `${k} is unknown`);
-      } else {
-        if (Array.isArray(v)) {
+function evalElement(ctx, result, schemas, evalCtx, k, v) {
+  let elset = set();
 
-          validateSchemasArray(ctx, result, elset, v);
-          validateSlices(ctx, result, elset, v);
+  collectSchemasForElement(ctx, elset, schemas, evalCtx, k)
 
-          v.forEach((x, i) => {
-            result.path.push(i);
-            validateSchemas(ctx, result, elset, x);
-            result.path.pop();
-          });
-        } else {
-          validateSchemas(ctx, result, elset, v);
-        }
-      }
+  if (isEmpty(elset)) {
+    addError(result, "unknown-element", `${k} is unknown`);
+    return;
+  }
+
+  validateArrayType(result, elset, k, v)
+
+  if (Array.isArray(v)) {
+    validateSchemasArray(ctx, result, elset, v);
+    validateSlices(ctx, result, elset, v);
+
+    v.forEach((x, i) => {
+      result.path.push(i);
+      validateSchemas(ctx, result, elset, x);
       result.path.pop();
     });
-
-    // post hook
-    each(multiChoice, (ch, chs)=>{
-      if(chs.length > 1){
-        result.path.push(ch);
-        addError(
-          result,
-          "choice",
-          `only one choice for ${ch} allowed, but multiple found: ${chs.join(', ')}`,
-        );
-        result.path.pop(ch);
-      }
-    });
+  } else {
+    validateSchemas(ctx, result, elset, v);
   }
+}
+
+function postValidate(ctx, result, evalCtx) {
+  each(evalCtx.multiChoice, (ch, chs)=>{
+    if(chs.length > 1){
+      result.path.push(ch);
+      addError(
+        result,
+        "choice",
+        `only one choice for ${ch} allowed, but multiple found: ${chs.join(', ')}`,
+      );
+      result.path.pop(ch);
+    }
+  });
+}
+
+// this is a main funciton
+// we eval simple data validators
+// and walk throw data for maps
+function validateSchemas(ctx, result, schemas, data) {
+
+  evalValidators(ctx, result, schemas, data)
+
+  if (!isMap(data)) { return }
+
+  let evalCtx = { multiChoice: {} };
+
+  each(data, (k, v) => {
+    result.path.push(k);
+    evalElement(ctx, result, schemas, evalCtx, k, v)
+    result.path.pop();
+  });
+
+  postValidate(ctx, result, evalCtx)
 }
 
 export function validate(ctx, schemaNames, data) {
@@ -712,3 +645,88 @@ export function validate(ctx, schemaNames, data) {
   validateSchemas(ctx, result, schset, data);
   return { errors: result.errors };
 }
+
+// function validateSchemasOld(ctx, result, schemas, data) {
+//   each(schemas, (schk, sch) => {
+//     for (const key in sch) {
+//       if (sch.hasOwnProperty(key)) {
+//         let validator = VALIDATORS[key]
+//         if (validator){
+//           validator(ctx, result, sch, data)
+//         } else {
+//           console.log(`No validator for ${key}`)
+//         }
+//       }
+//     }
+//   });
+//   if (isMap(data)) {
+//     const metChoices = {};
+//     let dataIsExtension = false;
+//     let dataIsNestedResource = false;
+//     // we walk the data by k/v
+//     each(data, (k, v) => {
+//       if (result.root && k === "resourceType") {
+//         result.root = false;
+//       } else {
+//         let elset = set();
+//         result.path.push(k);
+//         // collect subschemas for the key
+//         // we can determinie here that should it be an array or singular
+//         // and check later
+//         each(schemas, (schk, sch) => {
+//           let subsch = sch?.elements?.[k];
+//           if (subsch) {
+//             subsch.name = sch.name + "." + k; // TODO FIXME
+//             addSchemasToSet(ctx, elset, subsch);
+//             if (isReferenceOnExtension(subsch.type)) {
+//               dataIsExtension = true;
+//             }
+//             if (isReferenceOnResource(subsch.type)) {
+//               dataIsNestedResource = true;
+//             }
+//             const choiceOf = subsch.choiceOf;
+//             if (choiceOf) {
+//               checkOnlyOneChoicePresent(metChoices, choiceOf, k, result);
+//               metChoices[choiceOf] = [...(metChoices[choiceOf] || []), k];
+//             }
+//           }
+//         });
+//         // post schemas spin validations
+//         each(schemas, (_, schema) => {
+//           checkChoiceIsIncludedInChoiceList(metChoices, schema, result);
+//         });
+//         if (Object.keys(elset).length === 0) {
+//           addError(result, "unknown-element", `${k} is unknown`);
+//         } else {
+//           if (Array.isArray(v)) {
+//             validateSchemasArray(ctx, result, elset, v);
+//             validateSlices(ctx, result, elset, v);
+//             v.forEach((x, i) => {
+//               result.path.push(i);
+//               if (dataIsExtension) {
+//                 addSchemasToSet(ctx, elset, resolveSchemaFromUrl(ctx, x.url, result.path));
+//               }
+//               if (dataIsNestedResource) {
+//                 addSchemasToSet(ctx, elset, resolveSchemaFromUrl(ctx, x.resourceType, result.path));
+//                 result.root = true;
+//               }
+//               validateSchemas(ctx, result, elset, x);
+//               result.path.pop();
+//             });
+//           } else {
+//             if (dataIsExtension) {
+//               // TODO FIXME WE NEED TO FOLD THAT INTO SOME FUNCTION? SMELLS
+//               addSchemasToSet(ctx, elset, resolveSchemaFromUrl(ctx, v.url, result.path));
+//             }
+//             if (dataIsNestedResource) {
+//               addSchemasToSet(ctx, elset, resolveSchemaFromUrl(ctx, v.resourceType, result.path));
+//               result.root = true;
+//             }
+//             validateSchemas(ctx, result, elset, v);
+//           }
+//         }
+//         result.path.pop();
+//       }
+//     });
+//   }
+// }

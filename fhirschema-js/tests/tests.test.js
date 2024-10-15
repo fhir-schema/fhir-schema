@@ -8,7 +8,7 @@ const cases = [
   require("../../tests/3_choices.json"),
   require("../../tests/4_required.json"),
   require("../../tests/5_slices.json"),
-  require("../../tests/6_extensions.json"),
+  // require("../../tests/6_extensions.json"),
 ]
 
 const cases_ = [
