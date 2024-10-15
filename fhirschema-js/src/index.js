@@ -502,7 +502,8 @@ const IGNORE = {
   "type": true,
   "array": true,
   "base": true,
-  "slicing": true
+  "slicing": true,
+  "extensions": true
 }
 
 function evalValidators(ctx, result, schemas, data) {
@@ -522,6 +523,35 @@ function evalValidators(ctx, result, schemas, data) {
 }
 
 function collectSchemasForElement(ctx, elset, schemas, evalCtx, k) {
+
+  // extensions
+  if(k == 'extension') {
+    let slicing = {slices: {}}
+    each(schemas, (schemaPath,schema)=> {
+      if(schema.extensions){
+        each(schema.extensions,(extName, ext)=>{
+          let extSch = resolveSchema(ctx, ext.url)
+          if(!extSch) { console.log('could not resolve ', ext.url) }
+          let sch = Object.assign({}, ext)
+          delete sch.min;
+          delete sch.max;
+          delete sch.url;
+          slicing.slices[extName] = {
+            match: {
+              type: 'pattern',
+              value: {url: ext.url}
+            },
+            max: ext.max,
+            min: ext.min,
+            schema: Object.assign(sch,extSch)
+          }
+        })
+      }
+    })
+    // console.log('slicing', slicing)
+    addSchemasToSet(ctx, elset, {slicing: slicing}, 'extension');
+  }
+
   let choiceOf = null;
   each(schemas, (schk, sch) => {
     let subsch = sch?.elements?.[k];
@@ -536,6 +566,7 @@ function collectSchemasForElement(ctx, elset, schemas, evalCtx, k) {
       evalCtx.multiChoice[choiceOf].push(k)
     }
   });
+
   // if we found choiceOf - we have to collect all choice branches from all schemas
   if(choiceOf){
     each(schemas, (nm, sch)=>{
@@ -613,9 +644,6 @@ function postValidate(ctx, result, evalCtx) {
   });
 }
 
-// this is a main funciton
-// we eval simple data validators
-// and walk throw data for maps
 function validateSchemas(ctx, result, schemas, data) {
 
   evalValidators(ctx, result, schemas, data)
@@ -624,6 +652,8 @@ function validateSchemas(ctx, result, schemas, data) {
 
   let evalCtx = { multiChoice: {} };
 
+  // this is not enough because if there is extension or slices - data may be absent
+  // but we have to validate - probably we should use the postValidate for that
   each(data, (k, v) => {
     result.path.push(k);
     evalElement(ctx, result, schemas, evalCtx, k, v)
@@ -645,88 +675,3 @@ export function validate(ctx, schemaNames, data) {
   validateSchemas(ctx, result, schset, data);
   return { errors: result.errors };
 }
-
-// function validateSchemasOld(ctx, result, schemas, data) {
-//   each(schemas, (schk, sch) => {
-//     for (const key in sch) {
-//       if (sch.hasOwnProperty(key)) {
-//         let validator = VALIDATORS[key]
-//         if (validator){
-//           validator(ctx, result, sch, data)
-//         } else {
-//           console.log(`No validator for ${key}`)
-//         }
-//       }
-//     }
-//   });
-//   if (isMap(data)) {
-//     const metChoices = {};
-//     let dataIsExtension = false;
-//     let dataIsNestedResource = false;
-//     // we walk the data by k/v
-//     each(data, (k, v) => {
-//       if (result.root && k === "resourceType") {
-//         result.root = false;
-//       } else {
-//         let elset = set();
-//         result.path.push(k);
-//         // collect subschemas for the key
-//         // we can determinie here that should it be an array or singular
-//         // and check later
-//         each(schemas, (schk, sch) => {
-//           let subsch = sch?.elements?.[k];
-//           if (subsch) {
-//             subsch.name = sch.name + "." + k; // TODO FIXME
-//             addSchemasToSet(ctx, elset, subsch);
-//             if (isReferenceOnExtension(subsch.type)) {
-//               dataIsExtension = true;
-//             }
-//             if (isReferenceOnResource(subsch.type)) {
-//               dataIsNestedResource = true;
-//             }
-//             const choiceOf = subsch.choiceOf;
-//             if (choiceOf) {
-//               checkOnlyOneChoicePresent(metChoices, choiceOf, k, result);
-//               metChoices[choiceOf] = [...(metChoices[choiceOf] || []), k];
-//             }
-//           }
-//         });
-//         // post schemas spin validations
-//         each(schemas, (_, schema) => {
-//           checkChoiceIsIncludedInChoiceList(metChoices, schema, result);
-//         });
-//         if (Object.keys(elset).length === 0) {
-//           addError(result, "unknown-element", `${k} is unknown`);
-//         } else {
-//           if (Array.isArray(v)) {
-//             validateSchemasArray(ctx, result, elset, v);
-//             validateSlices(ctx, result, elset, v);
-//             v.forEach((x, i) => {
-//               result.path.push(i);
-//               if (dataIsExtension) {
-//                 addSchemasToSet(ctx, elset, resolveSchemaFromUrl(ctx, x.url, result.path));
-//               }
-//               if (dataIsNestedResource) {
-//                 addSchemasToSet(ctx, elset, resolveSchemaFromUrl(ctx, x.resourceType, result.path));
-//                 result.root = true;
-//               }
-//               validateSchemas(ctx, result, elset, x);
-//               result.path.pop();
-//             });
-//           } else {
-//             if (dataIsExtension) {
-//               // TODO FIXME WE NEED TO FOLD THAT INTO SOME FUNCTION? SMELLS
-//               addSchemasToSet(ctx, elset, resolveSchemaFromUrl(ctx, v.url, result.path));
-//             }
-//             if (dataIsNestedResource) {
-//               addSchemasToSet(ctx, elset, resolveSchemaFromUrl(ctx, v.resourceType, result.path));
-//               result.root = true;
-//             }
-//             validateSchemas(ctx, result, elset, v);
-//           }
-//         }
-//         result.path.pop();
-//       }
-//     });
-//   }
-// }

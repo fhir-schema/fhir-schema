@@ -20,7 +20,8 @@
       "extensions": {
         "us-core-race": {
           "url": "http://hl7.org/us-core-race",
-          "max": 1
+          "max": 1,
+          "min": 1
         }
       },
       "elements": {
@@ -43,9 +44,26 @@
           {
             "url": "unknown",
             "valueCode": "code"
+          },
+          {
+            "url": "http://hl7.org/us-core-race",
+            "valueString": "ok"
           }
         ]
       }
+    },
+    {
+      "desc": "missed extension",
+      "data": {
+        "resourceType": "Resource"
+      },
+      "errors": [
+        {
+         "message": "Slice defines the following min cardinality: '1', actual cardinality: '0'",
+         "path": "Resource.extension",
+         "type": "slice-cardinality"
+        }
+      ]
     },
     {
       "desc": "broken extension schema",
