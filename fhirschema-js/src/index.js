@@ -48,7 +48,6 @@ function addError(result, type, message) {
   } else {
     err.message = message;
   }
-
   result.errors.push(err);
 }
 
@@ -340,7 +339,6 @@ function validateSlices(ctx, result, schemas, data) {
 }
 
 
-
 let VALIDATORS = {
   fixed:       validateFixed,
   pattern:     validatePattern,
@@ -439,34 +437,6 @@ function validateSchemasArray(ctx, result, schemas, data) {
   });
 }
 
-
-// 1. shape validation (isObject/isArray/isPrimitive?)
-// 2. type validation (resolve types / check primitives) — type and elements keywords
-// 2.1 :type / :base
-// 2.2 :elements
-// 2.3 :required
-// 2.4 :excluded
-// 2.5 :min/:max
-// 2.6 :slicing
-// 2.7 :constraints
-// 2.8 :binding
-// 2.9 :choices / choiceOf
-// 2.10 :elementReference
-
-// validate(schemas, data)
-//   each schemas s
-//      each s.keyword
-//         validate_keyword(data)
-//   each data (k, v)=>
-//     el-schs = schemas_for_key(k)
-//     if el-schs empty => error(unkown key)
-//     if array(v)
-//        validateArray(el-schs, v)
-//        each v
-//          validate(el-schs, v)
-//     else
-//        validate(el-schs, v)
-
 function checkOnlyOneChoicePresent(metChoices, choiceOf, elementKey, result) {
   if (metChoices[choiceOf]) {
     addError(
@@ -519,7 +489,7 @@ function evalValidators(ctx, result, schemas, data) {
         }
       }
     })
-  });
+      });
 }
 
 function collectSchemasForElement(ctx, elset, schemas, evalCtx, k) {
@@ -555,6 +525,7 @@ function collectSchemasForElement(ctx, elset, schemas, evalCtx, k) {
   let choiceOf = null;
   each(schemas, (schk, sch) => {
     let subsch = sch?.elements?.[k];
+
 
     if (subsch && ! subsch.choices ) {
       subsch.name = sch.name + "." + k; // TODO FIXME
@@ -644,8 +615,17 @@ function postValidate(ctx, result, evalCtx) {
   });
 }
 
+function addDynamicSchemas(ctx, schemas, data){
+  each(schemas, (schN, sch)=>{
+    if(sch.type && sch.type == 'Resource'){
+      addSchemasToSet(ctx, schemas, resolveSchema(ctx, data.resourceType), data.resourceType);
+    }
+  })
+}
+
 function validateSchemas(ctx, result, schemas, data) {
 
+  addDynamicSchemas(ctx, schemas, data)
   evalValidators(ctx, result, schemas, data)
 
   if (!isMap(data)) { return }

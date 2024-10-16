@@ -9,12 +9,14 @@ const cases = [
   require("../../tests/4_required.json"),
   require("../../tests/5_slices.json"),
   require("../../tests/6_extensions.json"),
+  require("../../tests/7_bundles.json"),
 ]
 
 const cases_ = [
   // require("../../tests/5_slices.json"),
-  require("../../tests/6_extensions.json"),
+  //require("../../tests/6_extensions.json"),
   // require("../../tests/3_choices.json"),
+  require("../../tests/7_bundles.json"),
 ]
 
 cases.forEach((tcase)=>{
