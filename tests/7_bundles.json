@@ -1,5 +1,5 @@
 {
-  "desc": "extensions",
+  "desc": "bundles",
   "schemas": {
     "string":  { "kind": "primitive-type" },
     "Resource": {
